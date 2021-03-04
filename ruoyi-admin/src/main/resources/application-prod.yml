@@ -1,0 +1,21 @@
+# 项目相关配置
+ruoyi:
+  demoEnabled: false
+
+# 日志配置
+logging:
+  level:
+    com.ruoyi: warn
+
+# Spring配置
+spring:
+  # 服务模块
+  devtools:
+    restart:
+      # 热部署开关
+      enabled: false
+
+# Swagger配置
+swagger:
+  # 是否开启swagger
+  enabled: false
