@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: 'Henry的信息管理系统',
+      title: 'Henry的信息系统',
       logo: logoImg
     }
   }

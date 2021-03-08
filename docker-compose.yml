@@ -2,7 +2,9 @@ version: "3"
 services:
   nginx:
     image: nginx
+    container_name: website-nginx
     volumes:
+      - /www/website/nginx.conf:/etc/nginx/nginx.conf
       - /www/website/public:/usr/share/nginx/html:ro
     ports:
       - "3000:80"
@@ -11,13 +13,14 @@ services:
       - NGINX_PORT=80
   redis:
     image: redis
+    container_name: website-redis
     volumes:
       - redis-volume:/data
     ports:
       - 6379:6379
     command: redis-server --appendonly yes
     restart: unless-stopped
-  admin:
+  api:
     image: openjdk:8
     container_name: website-api
     volumes: 

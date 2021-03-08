@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.SpdMovieMapper">
+    
+    <resultMap type="SpdMovie" id="SpdMovieResult">
+        <result property="id"    column="id"    />
+        <result property="titleCn"    column="title_cn"    />
+        <result property="titleEn"    column="title_en"    />
+        <result property="desc"    column="desc"    />
+        <result property="imdb"    column="imdb"    />
+        <result property="douban"    column="douban"    />
+        <result property="href"    column="href"    />
+        <result property="country"    column="country"    />
+        <result property="category"    column="category"    />
+        <result property="showDate"    column="show_date"    />
+        <result property="poster"    column="poster"    />
+        <result property="deletedAt"    column="deleted_at"    />
+    </resultMap>
+
+    <sql id="selectSpdMovieVo">
+        select id, title_cn, title_en, `desc`, imdb, douban, href, country, category, show_date, poster, deleted_at from spd_movie
+    </sql>
+
+    <select id="selectSpdMovieList" parameterType="SpdMovie" resultMap="SpdMovieResult">
+        <include refid="selectSpdMovieVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="titleCn != null  and titleCn != ''"> and title_cn like concat('%', #{titleCn}, '%')</if>
+            <if test="titleEn != null  and titleEn != ''"> and title_en like concat('%', #{titleEn}, '%')</if>
+            <if test="desc != null  and desc != ''"> and desc like concat('%', #{desc}, '%')</if>
+            <if test="imdb != null "> and imdb &gt;= #{imdb}</if>
+            <if test="douban != null "> and douban &gt;= #{douban}</if>
+            <if test="country != null  and country != ''"> and country = #{country}</if>
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+            <if test="showDate != null  and showDate != ''"> and show_date &gt;= #{showDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectSpdMovieById" parameterType="Long" resultMap="SpdMovieResult">
+        <include refid="selectSpdMovieVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSpdMovie" parameterType="SpdMovie" useGeneratedKeys="true" keyProperty="id">
+        insert into spd_movie
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="titleCn != null and titleCn != ''">title_cn,</if>
+            <if test="titleEn != null and titleEn != ''">title_en,</if>
+            <if test="desc != null">desc,</if>
+            <if test="imdb != null">imdb,</if>
+            <if test="douban != null">douban,</if>
+            <if test="href != null and href != ''">href,</if>
+            <if test="country != null">country,</if>
+            <if test="category != null">category,</if>
+            <if test="showDate != null">show_date,</if>
+            <if test="poster != null">poster,</if>
+            <if test="deletedAt != null">deleted_at,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="titleCn != null and titleCn != ''">#{titleCn},</if>
+            <if test="titleEn != null and titleEn != ''">#{titleEn},</if>
+            <if test="desc != null">#{desc},</if>
+            <if test="imdb != null">#{imdb},</if>
+            <if test="douban != null">#{douban},</if>
+            <if test="href != null and href != ''">#{href},</if>
+            <if test="country != null">#{country},</if>
+            <if test="category != null">#{category},</if>
+            <if test="showDate != null">#{showDate},</if>
+            <if test="poster != null">#{poster},</if>
+            <if test="deletedAt != null">#{deletedAt},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSpdMovie" parameterType="SpdMovie">
+        update spd_movie
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="titleCn != null and titleCn != ''">title_cn = #{titleCn},</if>
+            <if test="titleEn != null and titleEn != ''">title_en = #{titleEn},</if>
+            <if test="desc != null">desc = #{desc},</if>
+            <if test="imdb != null">imdb = #{imdb},</if>
+            <if test="douban != null">douban = #{douban},</if>
+            <if test="href != null and href != ''">href = #{href},</if>
+            <if test="country != null">country = #{country},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="showDate != null">show_date = #{showDate},</if>
+            <if test="poster != null">poster = #{poster},</if>
+            <if test="deletedAt != null">deleted_at = #{deletedAt},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSpdMovieById" parameterType="Long">
+        delete from spd_movie where id = #{id}
+    </delete>
+
+    <delete id="deleteSpdMovieByIds" parameterType="String">
+        delete from spd_movie where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

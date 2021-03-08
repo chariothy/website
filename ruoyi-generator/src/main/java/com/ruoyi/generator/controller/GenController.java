@@ -1,6 +1,9 @@
 package com.ruoyi.generator.controller;
 
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,10 +204,14 @@ public class GenController extends BaseController
      */
     private void genCode(HttpServletResponse response, byte[] data) throws IOException
     {
+        Date now = new Date();
+        SimpleDateFormat ft = new SimpleDateFormat("yyyyMMdd_hhmmss");
+        String ts = MessageFormat.format("attachment; filename=\"gencode_{0}.zip\"", ft.format(now));
+
         response.reset();
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
-        response.setHeader("Content-Disposition", "attachment; filename=\"ruoyi.zip\"");
+        response.setHeader("Content-Disposition", ts);
         response.addHeader("Content-Length", "" + data.length);
         response.setContentType("application/octet-stream; charset=UTF-8");
         IOUtils.write(data, response.getOutputStream());

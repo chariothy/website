@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <artifactId>website-admin</artifactId>
+    <artifactId>ruoyi-admin</artifactId>
 
     <description>
         web服务入口
@@ -102,7 +102,7 @@
                 </configuration>   
            </plugin>   
         </plugins>
-        <finalName>${project.artifactId}</finalName>
+        <finalName>website-admin</finalName>
     </build>
 
 </project>
