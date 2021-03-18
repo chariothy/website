@@ -6,30 +6,30 @@ SET CWOLDPATH=%PATH%
 SET PATH=%CWRSYNCHOME%\BIN;%PATH%
 
 Rem Build jar
-echo ###################### Compiling API
+echo ###################### Compiling API ######################
 cd c:/projects/henry/website
 rd /s/q ruoyi-admin\target\classes
 call mvn clean package -Dmaven.test.skip=true
 if "%errorlevel%"=="1" goto :failed
 
-echo ###################### Uploading API
+echo ###################### Uploading API ######################
 rsync.exe -avrHzP --progress /cygdrive/c/projects/henry/website/ruoyi-admin/target/website-admin.jar henry@10.8.9.88::website/
 if "%errorlevel%"=="1" goto :failed
 pause
 
 rem Build ui
-echo ###################### Compiling VUE
+echo ###################### Compiling VUE ######################
 cd c:/projects/henry/website/ruoyi-ui
 call npm run build:prod
 if "%errorlevel%"=="1" goto :failed
 
-echo ###################### Uploading VUE
+echo ###################### Uploading VUE ######################
 rsync.exe -avrHzP --progress --delete /cygdrive/c/projects/henry/website/ruoyi-ui/dist/ henry@10.8.9.88::website/public/
 if "%errorlevel%"=="1" goto :failed
 pause
 
 rem Push index
-echo ###################### Publishing homepage
+echo ###################### Publishing homepage ######################
 cd C:\projects\henry\chariothy.github.io
 copy /Y c:\projects\henry\website\ruoyi-ui\dist\index.html
 git add .
@@ -53,8 +53,11 @@ goto end
 echo.
 echo.
 echo ***************************************************************************************
-echo 发布出错!!!
+echo                                   ERROR !!!
 echo ***************************************************************************************
 goto end
 
 :end
+
+echo ###################### - FINISHED - ######################
+cd c:/projects/henry/website

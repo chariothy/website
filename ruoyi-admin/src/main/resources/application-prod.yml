@@ -6,7 +6,12 @@ ruoyi:
 # 日志配置
 logging:
   level:
-    com.ruoyi: warn
+    com.ruoyi: error
+    org.springframework: error
+
+token:
+  # 令牌有效期（默认30分钟）
+  expireTime: 60
 
 # Spring配置
 spring:
@@ -20,3 +25,7 @@ spring:
 swagger:
   # 是否开启swagger
   enabled: false
+
+# 本网站配置
+website:
+  dataRoot: /data

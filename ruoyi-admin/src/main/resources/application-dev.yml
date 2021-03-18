@@ -1,3 +1,16 @@
 # 项目相关配置
 ruoyi:
   profile: C:/temp/upload
+
+logging:
+  level:
+    com.ruoyi: error
+    org.springframework: warn
+
+token:
+  # 令牌有效期（默认30分钟）
+  expireTime: 600
+
+# 本网站配置
+website:
+  dataRoot: C:/temp

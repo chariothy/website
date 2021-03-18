@@ -117,3 +117,8 @@ xss:
   excludes: /system/notice/*
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+# 本网站配置
+website:
+  # 数据根目录
+  dataRoot: /tmp

@@ -1,78 +1,18 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" id="search-area">
-      <el-form-item label="ID" prop="id">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="标题" prop="title">
         <el-input
-          v-model="queryParams.id"
-          placeholder="ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="中文标题" prop="titleCn">
-        <el-input
-          v-model="queryParams.titleCn"
-          placeholder="请输入中文标题"
+          v-model="queryParams.title"
+          placeholder="请输入标题"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="英文标题" prop="titleEn">
+      <el-form-item label="是否有码" prop="has_mosaic">
         <el-input
-          v-model="queryParams.titleEn"
-          placeholder="请输入英文标题"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="IMDB分数" prop="imdb">
-        <el-input
-          v-model="queryParams.imdb"
-          placeholder="IMDB分数"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="豆瓣分数" prop="douban">
-        <el-input
-          v-model="queryParams.douban"
-          placeholder="豆瓣分数"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="国家" prop="country">
-        <el-input
-          v-model="queryParams.country"
-          placeholder="国家"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="类别" prop="category">
-        <el-input
-          v-model="queryParams.category"
-          placeholder="请输入类别"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="上映日期" prop="showDate">
-        <el-input
-          v-model="queryParams.showDate"
-          placeholder="请输入上映日期"
+          v-model="queryParams.hasMosaic"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -81,6 +21,9 @@
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+      <el-form-item label="">
+        <el-checkbox v-model="showPic">显示图片</el-checkbox>
       </el-form-item>
     </el-form>
 
@@ -91,7 +34,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['relax:movie:add']"
+          v-hasPermi="['relax:blue:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -101,7 +44,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['relax:movie:edit']"
+          v-hasPermi="['relax:blue:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -111,7 +54,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['relax:movie:remove']"
+          v-hasPermi="['relax:blue:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -120,31 +63,38 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['relax:movie:export']"
+          v-hasPermi="['relax:blue:export']"
         >导出</el-button>
       </el-col>
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="movieList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="20" align="center" />
-      <el-table-column label="ID" width="50" align="center" prop="id" />
-      <el-table-column label="中文标题" width="220" align="center" prop="titleCn" />
-      <el-table-column label="英文标题" width="220" align="center" prop="titleEn" />
-      <el-table-column label="内容简介" align="center" prop="desc" />
-      <el-table-column label="IMDB" width="60" align="center" prop="imdb" />
-      <el-table-column label="豆瓣" width="60" align="center" prop="douban" />
-      <el-table-column label="电影海报" width="120" align="center" >
+    <el-table v-loading="loading" :data="blueList" @selection-change="handleSelectionChange" :row-class-name="tableRowClassName">
+      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column label="ID" width="80" align="center" prop="id" >
         <template slot-scope="scope">
-          <el-link :href="scope.row.href" type="primary" target="_blank"><el-image
-            style="width: 100px; height: 100px"
-            :src="scope.row.poster"
-            fit="contain"></el-image></el-link>
+          <a @click="handleTorrentFile(scope.row.id)">{{scope.row.id}}</a>
         </template>
       </el-table-column>
-      <el-table-column label="国家" width="80" align="center" prop="country" />
-      <el-table-column label="类别" width="80" align="center" prop="category" />
-      <el-table-column label="上映日期" width="80" align="center" prop="showDate" />
+      <el-table-column label="标题" width="200" align="center" prop="title" />
+      <el-table-column label="链接" width="100" align="center" prop="href" />
+      <el-table-column label="图片列表" align="center" prop="pics" >
+        <template slot-scope="scope">
+          <ul v-show="showPic">
+            <div v-for="pic in scope.row.pics" :key="pic">
+              <el-image
+                :src="pic"
+                fit="none"></el-image>
+            </div>
+          </ul>
+        </template>
+      </el-table-column>
+      <el-table-column label="磁力" width="80" align="center" prop="torrent" >
+        <template slot-scope="scope">
+          <el-link :href="scope.row.torrent" type="primary" target="_blank">torrent</el-link>
+        </template>
+      </el-table-column>
+      <el-table-column label="码" width="35" align="center" prop="hasMosaic" />
       <el-table-column label="操作" width="50" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -152,7 +102,7 @@
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['relax:movie:remove']"
+            v-hasPermi="['relax:blue:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -166,7 +116,7 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改最新电影对话框 -->
+    <!-- 添加或修改成人电影对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
       </el-form>
@@ -179,10 +129,13 @@
 </template>
 
 <script>
-import { listMovie, getMovie, delMovie, addMovie, updateMovie, exportMovie } from "@/api/relax/movie";
+import { listBlue, getBlue, delBlue, addBlue, updateBlue, exportBlue } from "@/api/relax/blue";
+import axios from 'axios'
+import { getToken } from '@/utils/auth'
+import { resolveBlob } from '@/utils/zipdownload'
 
 export default {
-  name: "Movie",
+  name: "Blue",
   components: {
   },
   data() {
@@ -199,8 +152,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 最新电影表格数据
-      movieList: [],
+      // 成人电影表格数据
+      blueList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -209,41 +162,35 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        id: null,
-        titleCn: null,
-        titleEn: null,
-        desc: null,
-        imdb: null,
-        douban: null,
-        country: null,
-        category: null,
-        showDate: null,
+        title: null,
+        hasMosaic: null,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        titleCn: [
-          { required: true, message: "中文标题不能为空", trigger: "blur" }
+        title: [
+          { required: true, message: "标题不能为空", trigger: "blur" }
         ],
-        titleEn: [
-          { required: true, message: "英文标题不能为空", trigger: "blur" }
-        ],
-        href: [
-          { required: true, message: "电影链接不能为空", trigger: "blur" }
-        ],
-      }
+      },
+      showPic: false
     };
   },
   created() {
     this.getList();
   },
   methods: {
-    /** 查询最新电影列表 */
+    /** 查询成人电影列表 */
     getList() {
       this.loading = true;
-      listMovie(this.queryParams).then(response => {
-        this.movieList = response.rows;
+      listBlue(this.queryParams).then(response => {
+        this.blueList = response.rows;
+        for (let i = 0; i < this.blueList.length; i++) {
+          let blue = this.blueList[i]
+          if(blue.pics && blue.pics.length > 2) {
+            this.blueList[i].pics = JSON.parse(blue.pics)
+          }
+        }
         this.total = response.total;
         this.loading = false;
       });
@@ -257,16 +204,11 @@ export default {
     reset() {
       this.form = {
         id: null,
-        titleCn: null,
-        titleEn: null,
-        desc: null,
-        imdb: null,
-        douban: null,
+        title: null,
         href: null,
-        country: null,
-        category: null,
-        showDate: null,
-        poster: null,
+        pics: null,
+        torrent: null,
+        hasMosaic: [],
         deletedAt: null
       };
       this.resetForm("form");
@@ -291,30 +233,32 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加最新电影";
+      this.title = "添加成人电影";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getMovie(id).then(response => {
+      getBlue(id).then(response => {
         this.form = response.data;
+        this.form.hasMosaic = this.form.hasMosaic.split(",");
         this.open = true;
-        this.title = "修改最新电影";
+        this.title = "修改成人电影";
       });
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          this.form.hasMosaic = this.form.hasMosaic.join(",");
           if (this.form.id != null) {
-            updateMovie(this.form).then(response => {
+            updateBlue(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addMovie(this.form).then(response => {
+            addBlue(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -326,12 +270,12 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除最新电影编号为"' + ids + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除成人电影编号为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delMovie(ids);
+          return delBlue(ids);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
@@ -340,26 +284,59 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有最新电影数据项?', "警告", {
+      this.$confirm('是否确认导出所有成人电影数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return exportMovie(queryParams);
+          return exportBlue(queryParams);
         }).then(response => {
           this.download(response.msg);
         })
+    },
+    tableRowClassName({row, rowIndex}) {
+      //console.log(row)
+      if(row.hasMosaic === 1){
+        return 'has-mosaic'
+      }else {
+        return 'no-mosaic'
+      }
+    },
+    handleTorrentFile(id) {
+      const mimeTorrent = 'application/x-bittorrent'
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_BASE_API + '/relax/blue/torrent/' + id,
+        responseType: 'blob',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+      }).then(res => {
+        if (res.data.type === mimeTorrent) {
+          resolveBlob(res, mimeTorrent)
+        } else {
+          res.data.text().then(result => {
+            let msg = ''
+            try {
+              msg = JSON.parse(result).msg
+            } catch (e) {
+              msg = '系统未知错误'
+            }
+
+            this.$alert(msg, '粗错啦', {
+              confirmButtonText: '确定',
+            })
+          })
+        }
+      })
     }
   }
 };
 </script>
 
 <style lang="scss">
-  .app-container {
-    #search-area {
-      .search-short {
-        width: 100px;
-      }
-    }
-  }
+.el-table .has-mosaic {
+  background: #e1e2f6;
+}
+.el-table .no-mosaic {
+  background: #f8e4e4;
+}
 </style>

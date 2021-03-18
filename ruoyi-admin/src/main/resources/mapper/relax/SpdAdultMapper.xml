@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.SpdAdultMapper">
+    
+    <resultMap type="SpdAdult" id="SpdAdultResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="href"    column="href"    />
+        <result property="pics"    column="pics"    />
+        <result property="torrent"    column="torrent"    />
+        <result property="hasMosaic"    column="has_mosaic"    />
+        <result property="deletedAt"    column="deleted_at"    />
+    </resultMap>
+
+    <sql id="selectSpdAdultVo">
+        select id, title, href, pics, torrent, has_mosaic, deleted_at from spd_adult
+    </sql>
+
+    <select id="selectSpdAdultList" parameterType="SpdAdult" resultMap="SpdAdultResult">
+        <include refid="selectSpdAdultVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="hasMosaic != null "> and has_mosaic = #{hasMosaic}</if>
+        </where>
+    </select>
+    
+    <select id="selectSpdAdultById" parameterType="Long" resultMap="SpdAdultResult">
+        <include refid="selectSpdAdultVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSpdAdult" parameterType="SpdAdult" useGeneratedKeys="true" keyProperty="id">
+        insert into spd_adult
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="href != null">href,</if>
+            <if test="pics != null">pics,</if>
+            <if test="torrent != null">torrent,</if>
+            <if test="hasMosaic != null">has_mosaic,</if>
+            <if test="deletedAt != null">deleted_at,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="href != null">#{href},</if>
+            <if test="pics != null">#{pics},</if>
+            <if test="torrent != null">#{torrent},</if>
+            <if test="hasMosaic != null">#{hasMosaic},</if>
+            <if test="deletedAt != null">#{deletedAt},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSpdAdult" parameterType="SpdAdult">
+        update spd_adult
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="href != null">href = #{href},</if>
+            <if test="pics != null">pics = #{pics},</if>
+            <if test="torrent != null">torrent = #{torrent},</if>
+            <if test="hasMosaic != null">has_mosaic = #{hasMosaic},</if>
+            <if test="deletedAt != null">deleted_at = #{deletedAt},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSpdAdultById" parameterType="Long">
+        delete from spd_adult where id = #{id}
+    </delete>
+
+    <delete id="deleteSpdAdultByIds" parameterType="String">
+        delete from spd_adult where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
