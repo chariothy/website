@@ -30,25 +30,6 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['relax:blue:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['relax:blue:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
           type="danger"
           icon="el-icon-delete"
           size="mini"
@@ -69,7 +50,8 @@
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="blueList" @selection-change="handleSelectionChange" :row-class-name="tableRowClassName">
+    <el-table v-loading="loading" :data="blueList" @selection-change="handleSelectionChange" :row-class-name="tableRowClassName"
+              ref="adultTable">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" width="80" align="center" prop="id" >
         <template slot-scope="scope">
@@ -115,6 +97,36 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-checkbox
+          size="medium"
+          style="margin: 4px"
+          @change="toggleSelectAll"
+        >全选</el-checkbox>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['relax:blue:remove']"
+        >删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['relax:blue:export']"
+        >导出</el-button>
+      </el-col>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
 
     <!-- 添加或修改成人电影对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
@@ -301,6 +313,9 @@ export default {
       }else {
         return 'no-mosaic'
       }
+    },
+    toggleSelectAll() {
+      this.$refs.adultTable.toggleAllSelection();
     },
     handleTorrentFile(id) {
       const mimeTorrent = 'application/x-bittorrent'

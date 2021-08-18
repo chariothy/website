@@ -71,7 +71,7 @@ Vue.config.productionTip = false
 
 /** 为github pages做的优化
  * github pages 不支持spa，因此刷新页面之后就会跳转到404页面
- * 解决方案：在404页面中将href重写为 /index?redirect=%2Frelax%2Fmovie&reason=404
+ * 解决方案：在github的404页面中将href重写为 /index?redirect=%2Frelax%2Fmovie&reason=404
  * 然后在route中加入钩子，如果检查到有redirect参数，则实行跳转
  */
 router.beforeEach(function(to, from, next) {

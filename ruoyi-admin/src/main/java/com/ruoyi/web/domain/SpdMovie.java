@@ -63,7 +63,7 @@ public class SpdMovie extends BaseEntity
     private String poster;
 
     /** 逻辑删除 */
-    private Date deletedAt;
+    private int seen;
 
     public void setId(Long id) 
     {
@@ -164,14 +164,14 @@ public class SpdMovie extends BaseEntity
     {
         return poster;
     }
-    public void setDeletedAt(Date deletedAt) 
+    public void setSeen(int seen)
     {
-        this.deletedAt = deletedAt;
+        this.seen = seen;
     }
 
-    public Date getDeletedAt() 
+    public int getSeen()
     {
-        return deletedAt;
+        return seen;
     }
 
     @Override
@@ -188,7 +188,7 @@ public class SpdMovie extends BaseEntity
             .append("category", getCategory())
             .append("showDate", getShowDate())
             .append("poster", getPoster())
-            .append("deletedAt", getDeletedAt())
+            .append("seen", getSeen())
             .toString();
     }
 }

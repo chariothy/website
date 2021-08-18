@@ -8,6 +8,7 @@ services:
       - /www/website/public:/usr/share/nginx/html:ro
     ports:
       - "3000:80"
+    restart: unless-stopped
     environment:
       - NGINX_HOST=static.thy.pub
       - NGINX_PORT=80
@@ -18,8 +19,8 @@ services:
       - redis-volume:/data
     ports:
       - 6379:6379
-    command: redis-server --appendonly yes
     restart: unless-stopped
+    command: redis-server --appendonly yes
   api:
     image: openjdk:8
     container_name: website-api
@@ -28,6 +29,7 @@ services:
       - /www/data:/data
     depends_on:
       - redis
+    restart: unless-stopped
     logging:
       options:
         max-size: "100m"

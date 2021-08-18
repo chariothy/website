@@ -49,33 +49,11 @@
           class="search-short"
         />
       </el-form-item>
-      <el-form-item label="国家" prop="country">
-        <el-input
-          v-model="queryParams.country"
-          placeholder="国家"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="类别" prop="category">
-        <el-input
-          v-model="queryParams.category"
-          placeholder="请输入类别"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="上映日期" prop="showDate">
-        <el-input
-          v-model="queryParams.showDate"
-          placeholder="请输入上映日期"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
+      <el-form-item prop="seen">
+        <el-checkbox
+          v-model="queryParams.seen"
+          :true-label=1 :false-label=0
+          label="已看过的" border
         />
       </el-form-item>
       <el-form-item>
@@ -145,6 +123,16 @@
       <el-table-column label="国家" width="80" align="center" prop="country" />
       <el-table-column label="类别" width="80" align="center" prop="category" />
       <el-table-column label="上映日期" width="80" align="center" prop="showDate" />
+      <el-table-column label="已看" align="center" width="100">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.seen"
+            active-value="0"
+            inactive-value="1"
+            @change="handleSeen(scope.row)"
+          ></el-switch>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="50" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -169,6 +157,11 @@
     <!-- 添加或修改最新电影对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="已看" prop="seen">
+          <el-checkbox v-model="form.seen"
+                       :true-label="1" :false-label="0"
+                       label="已看" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -218,6 +211,7 @@ export default {
         country: null,
         category: null,
         showDate: null,
+        seen: 0
       },
       // 表单参数
       form: {},
@@ -267,7 +261,7 @@ export default {
         category: null,
         showDate: null,
         poster: null,
-        deletedAt: null
+        seen: null
       };
       this.resetForm("form");
     },
@@ -336,6 +330,20 @@ export default {
           this.getList();
           this.msgSuccess("删除成功");
         })
+    },
+    /** 已看按钮操作 */
+    handleSeen(row) {
+      this.$confirm('是否确认将"' + row.titleCn + '"标志为已看?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        row.seen = 1
+        return updateMovie(row);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("标志为已看");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
