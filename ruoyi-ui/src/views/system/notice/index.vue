@@ -30,7 +30,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -39,6 +39,7 @@
       <el-col :span="1.5">
         <el-button
           type="primary"
+          plain
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
@@ -48,6 +49,7 @@
       <el-col :span="1.5">
         <el-button
           type="success"
+          plain
           icon="el-icon-edit"
           size="mini"
           :disabled="single"
@@ -58,6 +60,7 @@
       <el-col :span="1.5">
         <el-button
           type="danger"
+          plain
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
@@ -173,14 +176,10 @@
 </template>
 
 <script>
-import { listNotice, getNotice, delNotice, addNotice, updateNotice, exportNotice } from "@/api/system/notice";
-import Editor from '@/components/Editor';
+import { listNotice, getNotice, delNotice, addNotice, updateNotice } from "@/api/system/notice";
 
 export default {
   name: "Notice",
-  components: {
-    Editor
-  },
   data() {
     return {
       // 遮罩层
@@ -333,7 +332,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        }).catch(() => {});
     }
   }
 };

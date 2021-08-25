@@ -66,10 +66,12 @@ public class GenController extends BaseController
     public AjaxResult getInfo(@PathVariable Long talbleId)
     {
         GenTable table = genTableService.selectGenTableById(talbleId);
+        List<GenTable> tables = genTableService.selectGenTableAll();
         List<GenTableColumn> list = genTableColumnService.selectGenTableColumnListByTableId(talbleId);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("info", table);
         map.put("rows", list);
+        map.put("tables", tables);
         return AjaxResult.success(map);
     }
 
@@ -102,7 +104,7 @@ public class GenController extends BaseController
     /**
      * 导入表结构（保存）
      */
-    @PreAuthorize("@ss.hasPermi('tool:gen:list')")
+    @PreAuthorize("@ss.hasPermi('tool:gen:import')")
     @Log(title = "代码生成", businessType = BusinessType.IMPORT)
     @PostMapping("/importTable")
     public AjaxResult importTableSave(String tables)

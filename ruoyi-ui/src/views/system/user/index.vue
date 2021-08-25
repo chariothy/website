@@ -77,7 +77,7 @@
             ></el-date-picker>
           </el-form-item>
           <el-form-item>
-            <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
             <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
@@ -86,6 +86,7 @@
           <el-col :span="1.5">
             <el-button
               type="primary"
+              plain
               icon="el-icon-plus"
               size="mini"
               @click="handleAdd"
@@ -95,6 +96,7 @@
           <el-col :span="1.5">
             <el-button
               type="success"
+              plain
               icon="el-icon-edit"
               size="mini"
               :disabled="single"
@@ -105,6 +107,7 @@
           <el-col :span="1.5">
             <el-button
               type="danger"
+              plain
               icon="el-icon-delete"
               size="mini"
               :disabled="multiple"
@@ -115,6 +118,7 @@
           <el-col :span="1.5">
             <el-button
               type="info"
+              plain
               icon="el-icon-upload2"
               size="mini"
               @click="handleImport"
@@ -124,23 +128,25 @@
           <el-col :span="1.5">
             <el-button
               type="warning"
+              plain
               icon="el-icon-download"
               size="mini"
+              :loading="exportLoading"
               @click="handleExport"
               v-hasPermi="['system:user:export']"
             >导出</el-button>
           </el-col>
-          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
 
         <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="用户编号" align="center" prop="userId" />
-          <el-table-column label="用户名称" align="center" prop="userName" :show-overflow-tooltip="true" />
-          <el-table-column label="用户昵称" align="center" prop="nickName" :show-overflow-tooltip="true" />
-          <el-table-column label="部门" align="center" prop="dept.deptName" :show-overflow-tooltip="true" />
-          <el-table-column label="手机号码" align="center" prop="phonenumber" width="120" />
-          <el-table-column label="状态" align="center">
+          <el-table-column label="用户编号" align="center" key="userId" prop="userId" v-if="columns[0].visible" />
+          <el-table-column label="用户名称" align="center" key="userName" prop="userName" v-if="columns[1].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName" v-if="columns[2].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="部门" align="center" key="deptName" prop="dept.deptName" v-if="columns[3].visible" :show-overflow-tooltip="true" />
+          <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber" v-if="columns[4].visible" width="120" />
+          <el-table-column label="状态" align="center" key="status" v-if="columns[5].visible">
             <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.status"
@@ -150,7 +156,7 @@
               ></el-switch>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" align="center" prop="createTime" width="160">
+          <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[6].visible" width="160">
             <template slot-scope="scope">
               <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
@@ -161,7 +167,7 @@
             width="160"
             class-name="small-padding fixed-width"
           >
-            <template slot-scope="scope">
+            <template slot-scope="scope" v-if="scope.row.userId !== 1">
               <el-button
                 size="mini"
                 type="text"
@@ -170,20 +176,23 @@
                 v-hasPermi="['system:user:edit']"
               >修改</el-button>
               <el-button
-                v-if="scope.row.userId !== 1"
                 size="mini"
                 type="text"
                 icon="el-icon-delete"
                 @click="handleDelete(scope.row)"
                 v-hasPermi="['system:user:remove']"
               >删除</el-button>
-              <el-button
-                size="mini"
-                type="text"
-                icon="el-icon-key"
-                @click="handleResetPwd(scope.row)"
-                v-hasPermi="['system:user:resetPwd']"
-              >重置</el-button>
+              <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['system:user:resetPwd', 'system:user:edit']">
+                <span class="el-dropdown-link">
+                  <i class="el-icon-d-arrow-right el-icon--right"></i>更多
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="handleResetPwd" icon="el-icon-key"
+                    v-hasPermi="['system:user:resetPwd']">重置密码</el-dropdown-item>
+                  <el-dropdown-item command="handleAuthRole" icon="el-icon-circle-check"
+                    v-hasPermi="['system:user:edit']">分配角色</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </template>
           </el-table-column>
         </el-table>
@@ -204,7 +213,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户昵称" prop="nickName">
-              <el-input v-model="form.nickName" placeholder="请输入用户昵称" />
+              <el-input v-model="form.nickName" placeholder="请输入用户昵称" maxlength="30" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -228,12 +237,12 @@
         <el-row>
           <el-col :span="12">
             <el-form-item v-if="form.userId == undefined" label="用户名称" prop="userName">
-              <el-input v-model="form.userName" placeholder="请输入用户名称" />
+              <el-input v-model="form.userName" placeholder="请输入用户名称" maxlength="30" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item v-if="form.userId == undefined" label="用户密码" prop="password">
-              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" />
+              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" maxlength="20" show-password/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -319,15 +328,14 @@
         drag
       >
         <i class="el-icon-upload"></i>
-        <div class="el-upload__text">
-          将文件拖到此处，或
-          <em>点击上传</em>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip text-center" slot="tip">
+          <div class="el-upload__tip" slot="tip">
+            <el-checkbox v-model="upload.updateSupport" /> 是否更新已经存在的用户数据
+          </div>
+          <span>仅允许导入xls、xlsx格式文件。</span>
+          <el-link type="primary" :underline="false" style="font-size:12px;vertical-align: baseline;" @click="importTemplate">下载模板</el-link>
         </div>
-        <div class="el-upload__tip" slot="tip">
-          <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据
-          <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
-        </div>
-        <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
       </el-upload>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitFileForm">确 定</el-button>
@@ -351,6 +359,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -413,16 +423,28 @@ export default {
         status: undefined,
         deptId: undefined
       },
+      // 列信息
+      columns: [
+        { key: 0, label: `用户编号`, visible: true },
+        { key: 1, label: `用户名称`, visible: true },
+        { key: 2, label: `用户昵称`, visible: true },
+        { key: 3, label: `部门`, visible: true },
+        { key: 4, label: `手机号码`, visible: true },
+        { key: 5, label: `状态`, visible: true },
+        { key: 6, label: `创建时间`, visible: true }
+      ],
       // 表单校验
       rules: {
         userName: [
-          { required: true, message: "用户名称不能为空", trigger: "blur" }
+          { required: true, message: "用户名称不能为空", trigger: "blur" },
+          { min: 2, max: 20, message: '用户名称长度必须介于 2 和 20 之间', trigger: 'blur' }
         ],
         nickName: [
           { required: true, message: "用户昵称不能为空", trigger: "blur" }
         ],
         password: [
-          { required: true, message: "用户密码不能为空", trigger: "blur" }
+          { required: true, message: "用户密码不能为空", trigger: "blur" },
+          { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间', trigger: 'blur' }
         ],
         email: [
           {
@@ -527,7 +549,7 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.page = 1;
+      this.queryParams.pageNum = 1;
       this.getList();
     },
     /** 重置按钮操作 */
@@ -541,6 +563,19 @@ export default {
       this.ids = selection.map(item => item.userId);
       this.single = selection.length != 1;
       this.multiple = !selection.length;
+    },
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "handleResetPwd":
+          this.handleResetPwd(row);
+          break;
+        case "handleAuthRole":
+          this.handleAuthRole(row);
+          break;
+        default:
+          break;
+      }
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -574,12 +609,20 @@ export default {
     handleResetPwd(row) {
       this.$prompt('请输入"' + row.userName + '"的新密码', "提示", {
         confirmButtonText: "确定",
-        cancelButtonText: "取消"
+        cancelButtonText: "取消",
+        closeOnClickModal: false,
+        inputPattern: /^.{5,20}$/,
+        inputErrorMessage: "用户密码长度必须介于 5 和 20 之间",
       }).then(({ value }) => {
           resetUserPwd(row.userId, value).then(response => {
             this.msgSuccess("修改成功，新密码是：" + value);
           });
         }).catch(() => {});
+    },
+    /** 分配角色操作 */
+    handleAuthRole: function(row) {
+      const userId = row.userId;
+      this.$router.push("/system/user-auth/role/" + userId);
     },
     /** 提交按钮 */
     submitForm: function() {
@@ -613,7 +656,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -622,11 +665,13 @@ export default {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(function() {
+        }).then(() => {
+          this.exportLoading = true;
           return exportUser(queryParams);
         }).then(response => {
           this.download(response.msg);
-        })
+          this.exportLoading = false;
+        }).catch(() => {});
     },
     /** 导入按钮操作 */
     handleImport() {

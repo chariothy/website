@@ -50,7 +50,7 @@
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -59,6 +59,7 @@
       <el-col :span="1.5">
         <el-button
           type="primary"
+          plain
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
@@ -68,6 +69,7 @@
       <el-col :span="1.5">
         <el-button
           type="success"
+          plain
           icon="el-icon-edit"
           size="mini"
           :disabled="single"
@@ -78,6 +80,7 @@
       <el-col :span="1.5">
         <el-button
           type="danger"
+          plain
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
@@ -88,8 +91,10 @@
       <el-col :span="1.5">
         <el-button
           type="warning"
+          plain
           icon="el-icon-download"
           size="mini"
+          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['system:role:export']"
         >导出</el-button>
@@ -119,7 +124,7 @@
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+        <template slot-scope="scope" v-if="scope.row.roleId !== 1">
           <el-button
             size="mini"
             type="text"
@@ -130,17 +135,21 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-circle-check"
-            @click="handleDataScope(scope.row)"
-            v-hasPermi="['system:role:edit']"
-          >数据权限</el-button>
-          <el-button
-            size="mini"
-            type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['system:role:remove']"
           >删除</el-button>
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['system:role:edit']">
+            <span class="el-dropdown-link">
+              <i class="el-icon-d-arrow-right el-icon--right"></i>更多
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="handleDataScope" icon="el-icon-circle-check"
+                v-hasPermi="['system:role:edit']">数据权限</el-dropdown-item>
+              <el-dropdown-item command="handleAuthUser" icon="el-icon-user"
+                v-hasPermi="['system:role:edit']">分配用户</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -155,11 +164,17 @@
 
     <!-- 添加或修改角色配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="form.roleName" placeholder="请输入角色名称" />
         </el-form-item>
-        <el-form-item label="权限字符" prop="roleKey">
+        <el-form-item prop="roleKey">
+          <span slot="label">
+            <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasRole('admin')`)" placement="top">
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+            权限字符
+          </span>
           <el-input v-model="form.roleKey" placeholder="请输入权限字符" />
         </el-form-item>
         <el-form-item label="角色顺序" prop="roleSort">
@@ -209,7 +224,7 @@
           <el-input v-model="form.roleKey" :disabled="true" />
         </el-form-item>
         <el-form-item label="权限范围">
-          <el-select v-model="form.dataScope">
+          <el-select v-model="form.dataScope" @change="dataScopeSelectChange">
             <el-option
               v-for="item in dataScopeOptions"
               :key="item.value"
@@ -254,6 +269,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -462,6 +479,19 @@ export default {
       this.single = selection.length!=1
       this.multiple = !selection.length
     },
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "handleDataScope":
+          this.handleDataScope(row);
+          break;
+        case "handleAuthUser":
+          this.handleAuthUser(row);
+          break;
+        default:
+          break;
+      }
+    },
     // 树权限（展开/折叠）
     handleCheckedTreeExpand(value, type) {
       if (type == 'menu') {
@@ -509,11 +539,22 @@ export default {
         this.open = true;
         this.$nextTick(() => {
           roleMenu.then(res => {
-            this.$refs.menu.setCheckedKeys(res.checkedKeys);
+            let checkedKeys = res.checkedKeys
+            checkedKeys.forEach((v) => {
+                this.$nextTick(()=>{
+                    this.$refs.menu.setChecked(v, true ,false);
+                })
+            })
           });
         });
         this.title = "修改角色";
       });
+    },
+    /** 选择角色权限范围触发 */
+    dataScopeSelectChange(value) {
+      if(value !== '2') {
+        this.$refs.dept.setCheckedKeys([]);
+      }
     },
     /** 分配数据权限操作 */
     handleDataScope(row) {
@@ -529,6 +570,11 @@ export default {
         });
         this.title = "分配数据权限";
       });
+    },
+    /** 分配用户操作 */
+    handleAuthUser: function(row) {
+      const roleId = row.roleId;
+      this.$router.push("/system/role-auth/user/" + roleId);
     },
     /** 提交按钮 */
     submitForm: function() {
@@ -575,7 +621,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -584,11 +630,13 @@ export default {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(function() {
+        }).then(() => {
+          this.exportLoading = true;
           return exportRole(queryParams);
         }).then(response => {
           this.download(response.msg);
-        })
+          this.exportLoading = false;
+        }).catch(() => {});
     }
   }
 };

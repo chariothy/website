@@ -31,7 +31,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -40,6 +40,7 @@
       <el-col :span="1.5">
         <el-button
           type="primary"
+          plain
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
@@ -49,6 +50,7 @@
       <el-col :span="1.5">
         <el-button
           type="success"
+          plain
           icon="el-icon-edit"
           size="mini"
           :disabled="single"
@@ -59,6 +61,7 @@
       <el-col :span="1.5">
         <el-button
           type="danger"
+          plain
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
@@ -69,8 +72,10 @@
       <el-col :span="1.5">
         <el-button
           type="warning"
+          plain
           icon="el-icon-download"
           size="mini"
+          :loading="exportLoading"
           @click="handleExport"
           v-hasPermi="['monitor:job:export']"
         >导出</el-button>
@@ -78,6 +83,7 @@
       <el-col :span="1.5">
         <el-button
           type="info"
+          plain
           icon="el-icon-s-operation"
           size="mini"
           @click="handleJobLog"
@@ -109,17 +115,30 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-caret-right"
-            @click="handleRun(scope.row)"
-            v-hasPermi="['monitor:job:changeStatus']"
-          >执行一次</el-button>
+            icon="el-icon-edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['monitor:job:edit']"
+          >修改</el-button>
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleView(scope.row)"
-            v-hasPermi="['monitor:job:query']"
-          >详细</el-button>
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['monitor:job:remove']"
+          >删除</el-button>
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['monitor:job:changeStatus', 'monitor:job:query']">
+            <span class="el-dropdown-link">
+              <i class="el-icon-d-arrow-right el-icon--right"></i>更多
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="handleRun" icon="el-icon-caret-right"
+                v-hasPermi="['monitor:job:changeStatus']">执行一次</el-dropdown-item>
+              <el-dropdown-item command="handleView" icon="el-icon-view"
+                v-hasPermi="['monitor:job:query']">任务详细</el-dropdown-item>
+              <el-dropdown-item command="handleJobLog" icon="el-icon-s-operation"
+                v-hasPermi="['monitor:job:query']">调度日志</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -269,6 +288,8 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      // 导出遮罩层
+      exportLoading: false,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -377,6 +398,22 @@ export default {
       this.single = selection.length != 1;
       this.multiple = !selection.length;
     },
+    // 更多操作触发
+    handleCommand(command, row) {
+      switch (command) {
+        case "handleRun":
+          this.handleRun(row);
+          break;
+        case "handleView":
+          this.handleView(row);
+          break;
+        case "handleJobLog":
+          this.handleJobLog(row);
+          break;
+        default:
+          break;
+      }
+    },
     // 任务状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
@@ -402,7 +439,7 @@ export default {
           return runJob(row.jobId, row.jobGroup);
         }).then(() => {
           this.msgSuccess("执行成功");
-        })
+        }).catch(() => {});
     },
     /** 任务详细信息 */
     handleView(row) {
@@ -412,8 +449,9 @@ export default {
       });
     },
     /** 任务日志列表查询 */
-    handleJobLog() {
-      this.$router.push("/job/log");
+    handleJobLog(row) {
+      const jobId = row.jobId || 0;
+      this.$router.push({ path: '/monitor/job-log/index', query: { jobId: jobId } })
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -463,7 +501,7 @@ export default {
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        }).catch(() => {});
     },
     /** 导出按钮操作 */
     handleExport() {
@@ -472,11 +510,13 @@ export default {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(function() {
+        }).then(() => {
+          this.exportLoading = true;
           return exportJob(queryParams);
         }).then(response => {
           this.download(response.msg);
-        })
+          this.exportLoading = false;
+        }).catch(() => {});
     }
   }
 };

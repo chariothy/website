@@ -16,6 +16,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 import com.alibaba.fastjson.JSON;
@@ -26,10 +27,9 @@ import com.ruoyi.common.enums.HttpMethod;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
-import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
-import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.SysOperLog;
 
 /**
@@ -84,7 +84,7 @@ public class LogAspect
             }
 
             // 获取当前的用户
-            LoginUser loginUser = SpringUtils.getBean(TokenService.class).getLoginUser(ServletUtils.getRequest());
+            LoginUser loginUser = SecurityUtils.getLoginUser();
 
             // *========数据库日志=========*//
             SysOperLog operLog = new SysOperLog();
@@ -196,7 +196,7 @@ public class LogAspect
         {
             for (int i = 0; i < paramsArray.length; i++)
             {
-                if (!isFilterObject(paramsArray[i]))
+                if (StringUtils.isNotNull(paramsArray[i]) && !isFilterObject(paramsArray[i]))
                 {
                     Object jsonObj = JSON.toJSON(paramsArray[i]);
                     params += jsonObj.toString() + " ";
@@ -237,6 +237,7 @@ public class LogAspect
                 return entry.getValue() instanceof MultipartFile;
             }
         }
-        return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse;
+        return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse
+                || o instanceof BindingResult;
     }
 }

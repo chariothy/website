@@ -21,6 +21,7 @@
       <li @click="refreshSelectedTag(selectedTag)">刷新页面</li>
       <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">关闭当前</li>
       <li @click="closeOthersTags">关闭其他</li>
+      <li v-if="!isLastView()" @click="closeRightTags">关闭右侧</li>
       <li @click="closeAllTags(selectedTag)">关闭所有</li>
     </ul>
   </div>
@@ -29,7 +30,6 @@
 <script>
 import ScrollPane from './ScrollPane'
 import path from 'path'
-import Global from "@/layout/components/global.js";
 
 export default {
   components: { ScrollPane },
@@ -83,6 +83,13 @@ export default {
     },
     isAffix(tag) {
       return tag.meta && tag.meta.affix
+    },
+    isLastView() {
+      try {
+        return this.selectedTag.fullPath === this.visitedViews[this.visitedViews.length - 1].fullPath
+      } catch (err) {
+        return false
+      }
     },
     filterAffixTags(routes, basePath = '/') {
       let tags = []
@@ -145,7 +152,6 @@ export default {
           })
         })
       })
-      Global.$emit("removeCache", "refreshSelectedTag", this.selectedTag);
     },
     closeSelectedTag(view) {
       this.$store.dispatch('tagsView/delView', view).then(({ visitedViews }) => {
@@ -153,14 +159,19 @@ export default {
           this.toLastView(visitedViews, view)
         }
       })
-      Global.$emit("removeCache", "closeSelectedTag", view);
+    },
+    closeRightTags() {
+      this.$store.dispatch('tagsView/delRightTags', this.selectedTag).then(visitedViews => {
+        if (!visitedViews.find(i => i.fullPath === this.$route.fullPath)) {
+          this.toLastView(visitedViews)
+        }
+      })
     },
     closeOthersTags() {
-      this.$router.push(this.selectedTag)
+      this.$router.push(this.selectedTag).catch(()=>{});
       this.$store.dispatch('tagsView/delOthersViews', this.selectedTag).then(() => {
         this.moveToCurrentTag()
       })
-      Global.$emit("removeCache", "closeOthersTags", this.selectedTag);
     },
     closeAllTags(view) {
       this.$store.dispatch('tagsView/delAllViews').then(({ visitedViews }) => {
@@ -169,7 +180,6 @@ export default {
         }
         this.toLastView(visitedViews, view)
       })
-      Global.$emit("removeCache", "closeAllTags");
     },
     toLastView(visitedViews, view) {
       const latestView = visitedViews.slice(-1)[0]
