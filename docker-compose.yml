@@ -12,21 +12,25 @@ services:
     environment:
       - NGINX_HOST=static.thy.pub
       - NGINX_PORT=80
+    networks:
+      - website
   redis:
     image: redis
     container_name: website-redis
     volumes:
       - redis-volume:/data
-    ports:
-      - 6379:6379
     restart: unless-stopped
     command: redis-server --appendonly yes
+    networks:
+      - website
   api:
     image: openjdk:8
     container_name: website-api
     volumes: 
       - /www/website:/app
       - /www/data:/data
+    ports:
+      - "8080:8080"
     depends_on:
       - redis
     restart: unless-stopped
@@ -38,8 +42,14 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_DB=${MYSQL_DB}
       - MYSQL_PWD=${MYSQL_PWD}
-    network_mode: host
+      - MYSQL_HOST=${MYSQL_HOST}
+    networks:
+      - website
     command: java -jar "-Dspring.profiles.active=prod,druid" website-admin.jar
 
 volumes:
   redis-volume:
+
+networks:
+  website:
+    name: website

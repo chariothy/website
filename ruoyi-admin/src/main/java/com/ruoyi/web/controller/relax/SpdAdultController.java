@@ -11,8 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.ruoyi.common.constant.HttpStatus;
-import com.ruoyi.common.exception.CustomException;
-import org.apache.commons.io.IOUtils;
+import com.ruoyi.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,7 +127,7 @@ public class SpdAdultController extends BaseController
     {
         Path torrentPath = Paths.get(dataRoot, "torrents", id + ".torrent");
         if (!Files.exists(torrentPath) || Files.isDirectory(torrentPath)) {
-            throw new CustomException("文件不存在", HttpStatus.NOT_FOUND);
+            throw new ServiceException("文件不存在", HttpStatus.NOT_FOUND);
         }
         String ts = MessageFormat.format("attachment; filename=\"{0,number,#}.torrent\"", id);
 
