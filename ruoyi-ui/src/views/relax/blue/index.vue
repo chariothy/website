@@ -76,7 +76,9 @@
           <el-link :href="scope.row.torrent" type="primary" target="_blank">torrent</el-link>
         </template>
       </el-table-column>
-      <el-table-column label="码" width="35" align="center" prop="hasMosaic" />
+      <el-table-column label="码" width="35" align="center" prop="hasMosaic">
+        <template slot-scope="scope">{{ !!(scope.row.hasMosaic)?'骑':'步' }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="50" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -173,7 +175,7 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 50,
         title: null,
         hasMosaic: null,
       },
