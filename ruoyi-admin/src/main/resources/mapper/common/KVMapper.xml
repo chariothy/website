@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.KVMapper">
+    
+    <resultMap type="KV" id="KVResult">
+        <result property="id"    column="ID"    />
+        <result property="key"    column="key"    />
+        <result property="json"    column="json"    />
+    </resultMap>
+
+    <sql id="selectKVVo">
+        select ID, `key`, json from sys_key_json
+    </sql>
+
+    <select id="selectKVList" parameterType="KV" resultMap="KVResult">
+        <include refid="selectKVVo"/>
+        <where>  
+            <if test="key != null  and key != ''"> and key = #{key}</if>
+        </where>
+    </select>
+    
+    <select id="selectKVById" parameterType="Long" resultMap="KVResult">
+        <include refid="selectKVVo"/>
+        where ID = #{id}
+    </select>
+
+    <select id="selectKVByKey" parameterType="string" resultMap="KVResult">
+        <include refid="selectKVVo"/>
+        where `key` = #{key}
+    </select>
+
+    <insert id="insertKV" parameterType="KV" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_key_json
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="key != null and key != ''">key,</if>
+            <if test="json != null and json != ''">json,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="key != null and key != ''">#{key},</if>
+            <if test="json != null and json != ''">#{json},</if>
+         </trim>
+    </insert>
+
+    <update id="updateKV" parameterType="KV">
+        update sys_key_json
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="key != null and key != ''">key = #{key},</if>
+            <if test="json != null and json != ''">json = #{json},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+    <delete id="deleteKVById" parameterType="Long">
+        delete from sys_key_json where ID = #{id}
+    </delete>
+
+    <delete id="deleteKVByIds" parameterType="String">
+        delete from sys_key_json where ID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
