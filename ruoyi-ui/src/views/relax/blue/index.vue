@@ -58,8 +58,13 @@
           <a @click="handleTorrentFile(scope.row.id)">{{scope.row.id}}</a>
         </template>
       </el-table-column>
-      <el-table-column label="标题" width="200" align="center" prop="title" />
-      <el-table-column label="链接" width="100" align="center" prop="href" />
+      <el-table-column label="链接" width="100" align="center" prop="href">
+        <template slot-scope="scope">
+          <el-link :href="adultUrl+scope.row.href" type="primary" target="_blank">
+            {{scope.row.title}}
+          </el-link>
+        </template>
+      </el-table-column>
       <el-table-column label="图片列表" align="center" prop="pics" >
         <template slot-scope="scope">
           <ul v-show="showPic">
@@ -147,6 +152,7 @@ import { listBlue, getBlue, delBlue, addBlue, updateBlue, exportBlue } from "@/a
 import axios from 'axios'
 import { getToken } from '@/utils/auth'
 import { resolveBlob } from '@/utils/zipdownload'
+import { getKvByKey } from '@/api/system/kv'
 
 export default {
   name: "Blue",
@@ -187,11 +193,13 @@ export default {
           { required: true, message: "标题不能为空", trigger: "blur" }
         ],
       },
-      showPic: false
+      showPic: false,
+      adultUrl: ''
     };
   },
   created() {
     this.getList();
+    this.getAdultUrl();
   },
   methods: {
     /** 查询成人电影列表 */
@@ -207,6 +215,13 @@ export default {
         }
         this.total = response.total;
         this.loading = false;
+      });
+    },
+    /** 查询成人电影列表 */
+    getAdultUrl() {
+      getKvByKey('adult').then(response => {
+        let value = JSON.parse(response.data.json);
+        this.adultUrl = value['url'];
       });
     },
     // 取消按钮

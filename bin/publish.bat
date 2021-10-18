@@ -14,19 +14,19 @@ color 0a
 GOTO MENU
 :MENU
 ECHO.
-ECHO.               =-=-=-=-=项目编译菜单=-=-=-=-=
+ECHO.               =-=-=-=-=项目编译菜单 (Compile Menu)=-=-=-=-=
 ECHO.
-ECHO.                       1  前后端同时编译
+ECHO.                       1  前后端同时编译 Both
 ECHO.
-ECHO.                       2  仅编译后端服务
+ECHO.                       2  仅编译后端服务 API
 ECHO.
-ECHO.                       3  仅编译前端服务
+ECHO.                       3  仅编译前端服务 VUE
 ECHO.
-ECHO.                       4  退   出
+ECHO.                       4  退   出 Quit
 ECHO.
 ECHO.
 ECHO.
-echo.                请输入选择项目的序号：
+echo.                请输入选择项目的序号(Select Menu):
 set /p  ID=
 if "%id%"=="1"  goto API
 

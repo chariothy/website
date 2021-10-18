@@ -1,5 +1,6 @@
 package com.ruoyi;
 
+import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -26,5 +27,6 @@ public class RuoYiApplication
                 " |  | \\ `'   /|   `-'  /           \n" +
                 " |  |  \\    /  \\      /           \n" +
                 " ''-'   `'-'    `-..-'              ");
+        System.out.println(SecurityUtils.encryptPassword("admin123"));
     }
 }
