@@ -120,6 +120,15 @@
             fit="contain"></el-image></el-link>
         </template>
       </el-table-column>
+      <el-table-column label="磁力列表" width="200" align="center" prop="magnets" >
+        <template slot-scope="scope">
+          <ul>
+            <li v-for="magnet in scope.row.magnets" :key="magnet">
+              <el-link :href="magnet" type="primary" target="_blank">{{ getMagnetDesc(magnet) }}</el-link>
+            </li>
+          </ul>
+        </template>
+      </el-table-column>
       <el-table-column label="国家" width="80" align="center" prop="country" />
       <el-table-column label="类别" width="80" align="center" prop="category" />
       <el-table-column label="上映日期" width="80" align="center" prop="showDate" />
@@ -226,7 +235,8 @@ export default {
         href: [
           { required: true, message: "电影链接不能为空", trigger: "blur" }
         ],
-      }
+      },
+      reMagnet: /dn=(?:\[.+\])?([^&]+)/ig
     };
   },
   created() {
@@ -238,6 +248,12 @@ export default {
       this.loading = true;
       listMovie(this.queryParams).then(response => {
         this.movieList = response.rows;
+        for (let i = 0; i < this.movieList.length; i++) {
+          let movie = this.movieList[i]
+          if(movie.magnets && movie.magnets.length > 2) {
+            this.movieList[i].magnets = JSON.parse(movie.magnets)
+          }
+        }
         this.total = response.total;
         this.loading = false;
       });
@@ -339,6 +355,7 @@ export default {
         type: "warning"
       }).then(function() {
         row.seen = 1
+        row.magnets = JSON.stringify(row.magnets)
         return updateMovie(row);
       }).then(() => {
         this.getList();
@@ -357,6 +374,15 @@ export default {
         }).then(response => {
           this.download(response.msg);
         })
+    },
+    /** 从磁力地址中解析出描述文字 */
+    getMagnetDesc(magnet) {
+      let match = magnet.match(this.reMagnet)
+      console.log(magnet, match)
+      if(match) {
+        return RegExp.$1
+      }
+      return '磁力地址'
     }
   }
 };

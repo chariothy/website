@@ -16,11 +16,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="category"    column="category"    />
         <result property="showDate"    column="show_date"    />
         <result property="poster"    column="poster"    />
+        <result property="magnets"    column="magnets"    />
         <result property="seen"    column="seen"    />
     </resultMap>
 
     <sql id="selectSpdMovieVo">
-        select id, title_cn, title_en, `desc`, imdb, douban, href, country, category, show_date, poster, seen from spd_movie
+        select id, title_cn, title_en, `desc`, imdb, douban, href, country, category, show_date, poster, magnets, seen from spd_movie
     </sql>
 
     <select id="selectSpdMovieList" parameterType="SpdMovie" resultMap="SpdMovieResult">
@@ -57,6 +58,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="category != null">category,</if>
             <if test="showDate != null">show_date,</if>
             <if test="poster != null">poster,</if>
+            <if test="magnets != null">magnets,</if>
             <if test="seen != null">seen,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -70,6 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="category != null">#{category},</if>
             <if test="showDate != null">#{showDate},</if>
             <if test="poster != null">#{poster},</if>
+            <if test="magnets != null">#{magnets},</if>
             <if test="seen != null">#{seen},</if>
          </trim>
     </insert>

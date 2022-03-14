@@ -16,7 +16,7 @@ GOTO MENU
 ECHO.
 ECHO.                   =-=-=-=-=(Compile Menu)=-=-=-=-=
 ECHO.
-ECHO.                       1  Both backend & frontend
+ECHO.                       1  Both backend ^& frontend
 ECHO.
 ECHO.                       2  Only backend API
 ECHO.
@@ -26,7 +26,7 @@ ECHO.                       4  Quit
 ECHO.
 ECHO.
 ECHO.
-echo.               $ 请输入选择项目的序号(Select Menu):
+echo.               $ Please input (Select Menu):
 set /p  ID=
 if "%id%"=="1" goto API
 

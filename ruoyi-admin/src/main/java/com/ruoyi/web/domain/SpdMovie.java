@@ -62,6 +62,10 @@ public class SpdMovie extends BaseEntity
     @Excel(name = "电影海报")
     private String poster;
 
+    /** 磁力列表 */
+    @Excel(name = "磁力列表")
+    private String magnets;
+
     /** 逻辑删除 */
     private int seen;
 
@@ -164,6 +168,15 @@ public class SpdMovie extends BaseEntity
     {
         return poster;
     }
+    public void setMagnets(String magnets)
+    {
+        this.magnets = magnets;
+    }
+
+    public String getMagnets()
+    {
+        return magnets;
+    }
     public void setSeen(int seen)
     {
         this.seen = seen;
@@ -188,6 +201,7 @@ public class SpdMovie extends BaseEntity
             .append("category", getCategory())
             .append("showDate", getShowDate())
             .append("poster", getPoster())
+            .append("magnets", getMagnets())
             .append("seen", getSeen())
             .toString();
     }
