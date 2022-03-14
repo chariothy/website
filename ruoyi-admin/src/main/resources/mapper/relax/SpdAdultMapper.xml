@@ -11,11 +11,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pics"    column="pics"    />
         <result property="torrent"    column="torrent"    />
         <result property="hasMosaic"    column="has_mosaic"    />
+        <result property="source"    column="source"    />
         <result property="deletedAt"    column="deleted_at"    />
     </resultMap>
 
     <sql id="selectSpdAdultVo">
-        select id, title, href, pics, torrent, has_mosaic, deleted_at from spd_adult
+        select id, title, href, pics, torrent, has_mosaic, source, deleted_at from spd_adult
     </sql>
 
     <select id="selectSpdAdultList" parameterType="SpdAdult" resultMap="SpdAdultResult">
@@ -39,6 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="pics != null">pics,</if>
             <if test="torrent != null">torrent,</if>
             <if test="hasMosaic != null">has_mosaic,</if>
+            <if test="source != null">source,</if>
             <if test="deletedAt != null">deleted_at,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -47,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="pics != null">#{pics},</if>
             <if test="torrent != null">#{torrent},</if>
             <if test="hasMosaic != null">#{hasMosaic},</if>
+            <if test="source != null">#{source},</if>
             <if test="deletedAt != null">#{deletedAt},</if>
          </trim>
     </insert>
@@ -59,6 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="pics != null">pics = #{pics},</if>
             <if test="torrent != null">torrent = #{torrent},</if>
             <if test="hasMosaic != null">has_mosaic = #{hasMosaic},</if>
+            <if test="source != null">has_mosaic = #{source},</if>
             <if test="deletedAt != null">deleted_at = #{deletedAt},</if>
         </trim>
         where id = #{id}

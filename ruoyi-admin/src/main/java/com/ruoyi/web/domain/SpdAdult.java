@@ -40,6 +40,10 @@ public class SpdAdult extends BaseEntity
     @Excel(name = "是否有码")
     private Long hasMosaic;
 
+    /** 来源 */
+    @Excel(name = "来源")
+    private String source;
+
     /** 逻辑删除 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "逻辑删除", width = 30, dateFormat = "yyyy-MM-dd")
@@ -104,6 +108,15 @@ public class SpdAdult extends BaseEntity
         this.deletedAt = deletedAt;
     }
 
+    public String getSource()
+    {
+        return source;
+    }
+    public void setSource(String source)
+    {
+        this.source = source;
+    }
+
     public Date getDeletedAt() 
     {
         return deletedAt;
@@ -118,6 +131,7 @@ public class SpdAdult extends BaseEntity
             .append("pics", getPics())
             .append("torrent", getTorrent())
             .append("hasMosaic", getHasMosaic())
+            .append("source", getSource())
             .append("deletedAt", getDeletedAt())
             .toString();
     }

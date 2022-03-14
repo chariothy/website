@@ -60,7 +60,7 @@
       </el-table-column>
       <el-table-column label="链接" width="100" align="center" prop="href">
         <template slot-scope="scope">
-          <el-link :href="adultUrl+scope.row.href" type="primary" target="_blank">
+          <el-link :href="adultUrlMap[scope.row.source]+scope.row.href" type="primary" target="_blank">
             {{scope.row.title}}
           </el-link>
         </template>
@@ -194,12 +194,12 @@ export default {
         ],
       },
       showPic: false,
-      adultUrl: ''
+      adultUrlMap: {}
     };
   },
   created() {
     this.getList();
-    this.getAdultUrl();
+    this.getAdultUrlMap();
   },
   methods: {
     /** 查询成人电影列表 */
@@ -218,10 +218,10 @@ export default {
       });
     },
     /** 查询成人电影列表 */
-    getAdultUrl() {
-      getKvByKey('adult').then(response => {
+    getAdultUrlMap() {
+      getKvByKey('ad.url').then(response => {
         let value = JSON.parse(response.data.json);
-        this.adultUrl = value['url'];
+        this.adultUrlMap = value;
       });
     },
     // 取消按钮
