@@ -14,27 +14,27 @@ color 0a
 GOTO MENU
 :MENU
 ECHO.
-ECHO.               =-=-=-=-=项目编译菜单 (Compile Menu)=-=-=-=-=
+ECHO.                   =-=-=-=-=(Compile Menu)=-=-=-=-=
 ECHO.
-ECHO.                       1  前后端同时编译 Both
+ECHO.                       1  Both backend & frontend
 ECHO.
-ECHO.                       2  仅编译后端服务 API
+ECHO.                       2  Only backend API
 ECHO.
-ECHO.                       3  仅编译前端服务 VUE
+ECHO.                       3  Only frontend VUE
 ECHO.
-ECHO.                       4  退   出 Quit
+ECHO.                       4  Quit
 ECHO.
 ECHO.
 ECHO.
-echo.                请输入选择项目的序号(Select Menu):
+echo.               $ 请输入选择项目的序号(Select Menu):
 set /p  ID=
-if "%id%"=="1"  goto API
+if "%id%"=="1" goto API
 
 if "%id%"=="2" goto API
 
 if "%id%"=="3" goto VUE
 
-IF "%id%"=="4"  goto END
+IF "%id%"=="4" goto END
 PAUSE
 
 :API
@@ -76,11 +76,17 @@ pause
 
 rem Push index
 echo ###################### Publishing homepage ######################
-cd C:\projects\henry\chariothy.github.io
-copy /Y c:\projects\henry\website\ruoyi-ui\dist\index.html
-git add .
-git commit -m 'build'
-git push origin main
+rem -- Use github.com
+rem cd C:\projects\henry\chariothy.github.io
+rem copy /Y c:\projects\henry\website\ruoyi-ui\dist\index.html
+rem git add .
+rem git commit -m 'build'
+rem git push origin main
+
+rem Push to VPS
+rsync.exe -avrHzP --progress --delete /cygdrive/c/projects/henry/website/ruoyi-ui/dist/index.html henry@vps.thy.pub:/www/admin/
+ssh henry@vps.thy.pub chmod 644 /www/admin/index.html
+
 pause
 
 goto MENU
