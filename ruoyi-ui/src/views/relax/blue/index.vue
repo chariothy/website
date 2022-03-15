@@ -67,13 +67,9 @@
       </el-table-column>
       <el-table-column label="图片列表" align="center" prop="pics" >
         <template slot-scope="scope">
-          <ul v-show="showPic">
-            <div v-for="pic in scope.row.pics" :key="pic">
-              <el-image
-                :src="pic"
-                fit="none"></el-image>
-            </div>
-          </ul>
+          <viewer :images="scope.row.pics">
+            <img v-for="src in scope.row.pics" :key="src" :src="src">
+          </viewer>
         </template>
       </el-table-column>
       <el-table-column label="磁力" width="80" align="center" prop="torrent" >
@@ -153,6 +149,11 @@ import axios from 'axios'
 import { getToken } from '@/utils/auth'
 import { resolveBlob } from '@/utils/zipdownload'
 import { getKvByKey } from '@/api/system/kv'
+
+import 'viewerjs/dist/viewer.css'
+import VueViewer from 'v-viewer'
+import Vue from 'vue'
+Vue.use(VueViewer)
 
 export default {
   name: "Blue",
