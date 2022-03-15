@@ -27,6 +27,6 @@ public class RuoYiApplication
                 " |  | \\ `'   /|   `-'  /           \n" +
                 " |  |  \\    /  \\      /           \n" +
                 " ''-'   `'-'    `-..-'              ");
-        System.out.println(SecurityUtils.encryptPassword("admin123"));
+        System.out.println("开发数据库中的密码与线上相同！");
     }
 }

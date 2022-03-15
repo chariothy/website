@@ -106,51 +106,60 @@
 
     <el-table v-loading="loading" :data="movieList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="20" align="center" />
-      <el-table-column label="ID" width="50" align="center" prop="id" />
-      <el-table-column label="中文标题" width="220" align="center" prop="titleCn" />
-      <el-table-column label="英文标题" width="220" align="center" prop="titleEn" />
+      <el-table-column label="标题" width="200" align="center">
+        <template slot-scope="scope">
+          <el-link :href="scope.row.href" type="primary" target="_blank">
+            ID={{ scope.row.id}} <br>
+            {{ scope.row.titleCn }} <br>
+            {{ scope.row.titleEn }}
+          </el-link>
+        </template>
+      </el-table-column>
       <el-table-column label="内容简介" align="center" prop="desc" />
       <el-table-column label="IMDB" width="60" align="center" prop="imdb" />
       <el-table-column label="豆瓣" width="60" align="center" prop="douban" />
-      <el-table-column label="电影海报" width="120" align="center" >
+      <el-table-column label="电影海报" width="340" align="center" >
         <template slot-scope="scope">
-          <el-link :href="scope.row.href" type="primary" target="_blank"><el-image
-            style="width: 100px; height: 100px"
-            :src="scope.row.poster"
-            fit="contain"></el-image></el-link>
+          <viewer :images="scope.row.poster">
+            <img v-for="src in scope.row.poster" :key="src" :src="src" width="100%" height="100%">
+          </viewer>
         </template>
       </el-table-column>
-      <el-table-column label="磁力列表" width="200" align="center" prop="magnets" >
+      <el-table-column label="其它信息" width="200" align="center" prop="magnets" >
         <template slot-scope="scope">
-          <ul>
-            <li v-for="magnet in scope.row.magnets" :key="magnet">
-              <el-link :href="magnet" type="primary" target="_blank">{{ getMagnetDesc(magnet) }}</el-link>
-            </li>
-          </ul>
-        </template>
-      </el-table-column>
-      <el-table-column label="国家" width="80" align="center" prop="country" />
-      <el-table-column label="类别" width="80" align="center" prop="category" />
-      <el-table-column label="上映日期" width="80" align="center" prop="showDate" />
-      <el-table-column label="已看" align="center" width="100">
-        <template slot-scope="scope">
-          <el-switch
-            v-model="scope.row.seen"
-            active-value="0"
-            inactive-value="1"
-            @change="handleSeen(scope.row)"
-          ></el-switch>
+          <div>
+            {{ scope.row.country }} <br>
+            {{ scope.row.category }} <br>
+            {{ scope.row.showDate }} <br>
+            <ul>
+              <li v-for="magnet in scope.row.magnets" :key="magnet">
+                <el-link :href="magnet" type="primary" target="_blank">
+                  {{ parseMagnetDesc(magnet) }}
+                </el-link>
+              </li>
+            </ul>
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="50" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['relax:movie:remove']"
-          >删除</el-button>
+          <div>
+            <el-tooltip class="item" effect="dark" content="标志为已看" placement="left">
+            <el-switch
+              v-model="scope.row.seen"
+              active-value="0"
+              inactive-value="1"
+              @change="handleSeen(scope.row)"
+            ></el-switch>
+            </el-tooltip>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row)"
+              v-hasPermi="['relax:movie:remove']"
+            >删除</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -182,6 +191,13 @@
 
 <script>
 import { listMovie, getMovie, delMovie, addMovie, updateMovie, exportMovie } from "@/api/relax/movie";
+
+import 'viewerjs/dist/viewer.css'
+import VueViewer from 'v-viewer'
+import Vue from 'vue'
+Vue.use(VueViewer)
+
+import { parseMagnetDesc } from "@/utils/henry"
 
 export default {
   name: "Movie",
@@ -236,13 +252,13 @@ export default {
           { required: true, message: "电影链接不能为空", trigger: "blur" }
         ],
       },
-      reMagnet: /dn=(?:\[.+\])?([^&]+)/ig
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    parseMagnetDesc,
     /** 查询最新电影列表 */
     getList() {
       this.loading = true;
@@ -252,6 +268,9 @@ export default {
           let movie = this.movieList[i]
           if(movie.magnets && movie.magnets.length > 2) {
             this.movieList[i].magnets = JSON.parse(movie.magnets)
+          }
+          if(movie.poster && movie.poster.length > 2) {
+            this.movieList[i].poster = JSON.parse(movie.poster)
           }
         }
         this.total = response.total;
@@ -355,6 +374,7 @@ export default {
         type: "warning"
       }).then(function() {
         row.seen = 1
+        row.poster = JSON.stringify(row.poster)
         row.magnets = JSON.stringify(row.magnets)
         return updateMovie(row);
       }).then(() => {
@@ -374,15 +394,6 @@ export default {
         }).then(response => {
           this.download(response.msg);
         })
-    },
-    /** 从磁力地址中解析出描述文字 */
-    getMagnetDesc(magnet) {
-      let match = magnet.match(this.reMagnet)
-      console.log(magnet, match)
-      if(match) {
-        return RegExp.$1
-      }
-      return '磁力地址'
     }
   }
 };

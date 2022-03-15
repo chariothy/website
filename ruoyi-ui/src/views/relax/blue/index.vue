@@ -55,35 +55,24 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="链接" width="200" align="center" prop="href">
         <template slot-scope="scope">
-          <el-link :href="adultUrlMap[scope.row.source]+scope.row.href" type="primary" target="_blank">
-            ID={{ scope.row.id}} <br> {{scope.row.title}}
-          </el-link>
+          <div>
+            <el-link :href="adultUrlMap[scope.row.source]+scope.row.href" type="primary" target="_blank">
+              ID={{ scope.row.id}} （{{ !!(scope.row.hasMosaic)?'骑':'步' }}）<br>
+              {{ scope.row.title }} <br>
+            </el-link>
+            ======
+            <br>
+            <el-link :href="scope.row.torrent" type="primary" target="_blank">
+              {{ parseMagnetDesc(scope.row.torrent) }}
+            </el-link>
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="图片列表" align="center" prop="pics" >
         <template slot-scope="scope">
-          <viewer :images="scope.row.pics">
+          <viewer :images="scope.row.pics" v-show="showPic">
             <img v-for="src in scope.row.pics" :key="src" :src="src" width="100%" height="100%">
           </viewer>
-        </template>
-      </el-table-column>
-      <el-table-column label="磁力" width="200" align="center" prop="torrent" >
-        <template slot-scope="scope">
-          <el-link :href="scope.row.torrent" type="primary" target="_blank">{{ parseMagnetDesc(scope.row.torrent) }}</el-link>
-        </template>
-      </el-table-column>
-      <el-table-column label="码" width="35" align="center" prop="hasMosaic">
-        <template slot-scope="scope">{{ !!(scope.row.hasMosaic)?'骑':'步' }}</template>
-      </el-table-column>
-      <el-table-column label="操作" width="50" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['relax:blue:remove']"
-          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
