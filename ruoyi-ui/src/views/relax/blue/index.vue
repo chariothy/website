@@ -53,28 +53,23 @@
     <el-table v-loading="loading" :data="blueList" @selection-change="handleSelectionChange" :row-class-name="tableRowClassName"
               ref="adultTable">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" width="80" align="center" prop="id" >
-        <template slot-scope="scope">
-          <a @click="handleTorrentFile(scope.row.id)">{{scope.row.id}}</a>
-        </template>
-      </el-table-column>
-      <el-table-column label="链接" width="100" align="center" prop="href">
+      <el-table-column label="链接" width="200" align="center" prop="href">
         <template slot-scope="scope">
           <el-link :href="adultUrlMap[scope.row.source]+scope.row.href" type="primary" target="_blank">
-            {{scope.row.title}}
+            ID={{ scope.row.id}} <br> {{scope.row.title}}
           </el-link>
         </template>
       </el-table-column>
       <el-table-column label="图片列表" align="center" prop="pics" >
         <template slot-scope="scope">
           <viewer :images="scope.row.pics">
-            <img v-for="src in scope.row.pics" :key="src" :src="src">
+            <img v-for="src in scope.row.pics" :key="src" :src="src" width="100%" height="100%">
           </viewer>
         </template>
       </el-table-column>
-      <el-table-column label="磁力" width="80" align="center" prop="torrent" >
+      <el-table-column label="磁力" width="200" align="center" prop="torrent" >
         <template slot-scope="scope">
-          <el-link :href="scope.row.torrent" type="primary" target="_blank">torrent</el-link>
+          <el-link :href="scope.row.torrent" type="primary" target="_blank">{{ parseMagnetDesc(scope.row.torrent) }}</el-link>
         </template>
       </el-table-column>
       <el-table-column label="码" width="35" align="center" prop="hasMosaic">
@@ -145,15 +140,14 @@
 
 <script>
 import { listBlue, getBlue, delBlue, addBlue, updateBlue, exportBlue } from "@/api/relax/blue";
-import axios from 'axios'
-import { getToken } from '@/utils/auth'
-import { resolveBlob } from '@/utils/zipdownload'
 import { getKvByKey } from '@/api/system/kv'
 
 import 'viewerjs/dist/viewer.css'
 import VueViewer from 'v-viewer'
 import Vue from 'vue'
 Vue.use(VueViewer)
+
+import { parseMagnetDesc } from "@/utils/henry"
 
 export default {
   name: "Blue",
@@ -203,6 +197,7 @@ export default {
     this.getAdultUrlMap();
   },
   methods: {
+    parseMagnetDesc,
     /** 查询成人电影列表 */
     getList() {
       this.loading = true;
@@ -334,32 +329,6 @@ export default {
     },
     toggleSelectAll() {
       this.$refs.adultTable.toggleAllSelection();
-    },
-    handleTorrentFile(id) {
-      const mimeTorrent = 'application/x-bittorrent'
-      axios({
-        method: 'get',
-        url: process.env.VUE_APP_BASE_API + '/relax/blue/torrent/' + id,
-        responseType: 'blob',
-        headers: { 'Authorization': 'Bearer ' + getToken() }
-      }).then(res => {
-        if (res.data.type === mimeTorrent) {
-          resolveBlob(res, mimeTorrent)
-        } else {
-          res.data.text().then(result => {
-            let msg = ''
-            try {
-              msg = JSON.parse(result).msg
-            } catch (e) {
-              msg = '系统未知错误'
-            }
-
-            this.$alert(msg, '粗错啦', {
-              confirmButtonText: '确定',
-            })
-          })
-        }
-      })
     }
   }
 };
