@@ -108,8 +108,8 @@
       <el-table-column type="selection" width="20" align="center" />
       <el-table-column label="标题" width="200" align="center">
         <template slot-scope="scope">
+          ID={{ scope.row.id }} <br>
           <el-link :href="scope.row.href" type="primary" target="_blank">
-            ID={{ scope.row.id}} <br>
             {{ scope.row.titleCn }} <br>
             {{ scope.row.titleEn }}
           </el-link>

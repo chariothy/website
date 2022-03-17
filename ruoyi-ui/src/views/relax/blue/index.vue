@@ -56,8 +56,15 @@
       <el-table-column label="链接" width="200" align="center" prop="href">
         <template slot-scope="scope">
           <div>
+            ID={{ scope.row.id }} （
+            <span v-if="!!scope.row.hasMosaic">
+              <span style="background-color: black; color: white">骑</span>
+            </span>
+            <span v-else>
+              <span style="background-color: red; color: white">步</span>
+            </span>）
+            【{{ scope.row.source }}】
             <el-link :href="adultUrlMap[scope.row.source]+scope.row.href" type="primary" target="_blank">
-              ID={{ scope.row.id}} （{{ !!(scope.row.hasMosaic)?'骑':'步' }}）<br>
               {{ scope.row.title }} <br>
             </el-link>
             ======
@@ -70,7 +77,7 @@
       </el-table-column>
       <el-table-column label="图片列表" align="center" prop="pics" >
         <template slot-scope="scope">
-          <viewer :images="scope.row.pics" v-show="showPic">
+          <viewer :images="scope.row.pics" v-show="showPic" v-if="showPic">
             <img v-for="src in scope.row.pics" :key="src" :src="src" width="100%" height="100%">
           </viewer>
         </template>
