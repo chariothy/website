@@ -105,8 +105,7 @@
     </el-row>
 
     <el-table v-loading="loading" :data="movieList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="20" align="center" />
-      <el-table-column label="标题" width="200" align="center">
+      <el-table-column label="标题" min-width="20%" align="center">
         <template slot-scope="scope">
           ID={{ scope.row.id }} <br>
           <el-link :href="scope.row.href" type="primary" target="_blank">
@@ -115,17 +114,21 @@
           </el-link>
         </template>
       </el-table-column>
-      <el-table-column label="内容简介" align="center" prop="desc" />
-      <el-table-column label="IMDB" width="60" align="center" prop="imdb" />
-      <el-table-column label="豆瓣" width="60" align="center" prop="douban" />
-      <el-table-column label="电影海报" width="340" align="center" >
+      <el-table-column label="内容简介" min-width="40%" align="center" prop="desc" />
+      <el-table-column label="评分" min-width="10%" align="center" >
+        <template slot-scope="scope">
+          IMDB={{ scope.row.imdb }} <br>
+          豆瓣={{ scope.row.douban }} <br>
+        </template>
+      </el-table-column>
+      <el-table-column label="电影海报" min-width="30%" align="center" >
         <template slot-scope="scope">
           <viewer :images="scope.row.poster">
             <img v-for="src in scope.row.poster" :key="src" :src="src" width="100%" height="100%">
           </viewer>
         </template>
       </el-table-column>
-      <el-table-column label="其它信息" width="200" align="center" prop="magnets" >
+      <el-table-column label="其它信息" min-width="15%" align="center" prop="magnets" >
         <template slot-scope="scope">
           <div>
             {{ scope.row.country }} <br>
@@ -141,7 +144,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="50" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" min-width="10%" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <div>
             <el-tooltip class="item" effect="dark" content="标志为已看" placement="left">

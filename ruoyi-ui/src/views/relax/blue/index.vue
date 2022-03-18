@@ -52,8 +52,7 @@
 
     <el-table v-loading="loading" :data="blueList" @selection-change="handleSelectionChange" :row-class-name="tableRowClassName"
               ref="adultTable">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="链接" width="200" align="center" prop="href">
+      <el-table-column label="链接" min-width="20%" align="center" prop="href">
         <template slot-scope="scope">
           <div>
             ID={{ scope.row.id }} （
@@ -75,7 +74,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="图片列表" align="center" prop="pics" >
+      <el-table-column label="图片列表" min-width="80%" align="center" prop="pics" >
         <template slot-scope="scope">
           <viewer :images="scope.row.pics" v-show="showPic" v-if="showPic">
             <img v-for="src in scope.row.pics" :key="src" :src="src" width="100%" height="100%">
