@@ -52,6 +52,7 @@
 
     <el-table v-loading="loading" :data="blueList" @selection-change="handleSelectionChange" :row-class-name="tableRowClassName"
               ref="adultTable">
+      <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="链接" min-width="20%" align="center" prop="href">
         <template slot-scope="scope">
           <div>
