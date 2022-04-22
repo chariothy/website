@@ -153,6 +153,7 @@
               active-value="0"
               inactive-value="1"
               @change="handleSeen(scope.row)"
+              v-hasPermi="['relax:movie:edit']"
             ></el-switch>
             </el-tooltip>
             <el-button

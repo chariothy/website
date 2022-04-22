@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.SpdFundBaseMapper">
+    
+    <resultMap type="SpdFundBase" id="SpdFundBaseResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="code"    column="code"    />
+        <result property="m1Return"    column="m1_return"    />
+        <result property="m1Index"    column="m1_index"    />
+        <result property="m1Cat"    column="m1_cat"    />
+        <result property="regDate"    column="reg_date"    />
+        <result property="openDate"    column="open_date"    />
+        <result property="saleDate"    column="sale_date"    />
+        <result property="canBuy"    column="can_buy"    />
+        <result property="canSale"    column="can_sale"    />
+        <result property="minBuy"    column="min_buy"    />
+        <result property="fee"    column="fee"    />
+        <result property="manager"    column="manager"    />
+        <result property="favorite"    column="favorite"    />
+    </resultMap>
+
+    <sql id="selectSpdFundBaseVo">
+        select id, name, category_id, class_id, code, m1_return, m1_index, m1_cat, reg_date, open_date, sale_date, can_buy, can_sale, min_buy, fee, manager, favorite from spd_ms_fund_base
+    </sql>
+
+    <select id="selectSpdFundBaseList" parameterType="SpdFundBase" resultMap="SpdFundBaseResult">
+        <include refid="selectSpdFundBaseVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="favorite != null "> and favorite = #{favorite}</if>
+        </where>
+    </select>
+    
+    <select id="selectSpdFundBaseById" parameterType="Long" resultMap="SpdFundBaseResult">
+        <include refid="selectSpdFundBaseVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSpdFundBase" parameterType="SpdFundBase" useGeneratedKeys="true" keyProperty="id">
+        insert into spd_ms_fund_base
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="classId != null">class_id,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="m1Return != null">m1_return,</if>
+            <if test="m1Index != null">m1_index,</if>
+            <if test="m1Cat != null">m1_cat,</if>
+            <if test="regDate != null">reg_date,</if>
+            <if test="openDate != null">open_date,</if>
+            <if test="saleDate != null">sale_date,</if>
+            <if test="canBuy != null">can_buy,</if>
+            <if test="canSale != null">can_sale,</if>
+            <if test="minBuy != null">min_buy,</if>
+            <if test="fee != null">fee,</if>
+            <if test="manager != null">manager,</if>
+            <if test="favorite != null">favorite,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="classId != null">#{classId},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="m1Return != null">#{m1Return},</if>
+            <if test="m1Index != null">#{m1Index},</if>
+            <if test="m1Cat != null">#{m1Cat},</if>
+            <if test="regDate != null">#{regDate},</if>
+            <if test="openDate != null">#{openDate},</if>
+            <if test="saleDate != null">#{saleDate},</if>
+            <if test="canBuy != null">#{canBuy},</if>
+            <if test="canSale != null">#{canSale},</if>
+            <if test="minBuy != null">#{minBuy},</if>
+            <if test="fee != null">#{fee},</if>
+            <if test="manager != null">#{manager},</if>
+            <if test="favorite != null">#{favorite},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSpdFundBase" parameterType="SpdFundBase">
+        update spd_ms_fund_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="classId != null">class_id = #{classId},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="m1Return != null">m1_return = #{m1Return},</if>
+            <if test="m1Index != null">m1_index = #{m1Index},</if>
+            <if test="m1Cat != null">m1_cat = #{m1Cat},</if>
+            <if test="regDate != null">reg_date = #{regDate},</if>
+            <if test="openDate != null">open_date = #{openDate},</if>
+            <if test="saleDate != null">sale_date = #{saleDate},</if>
+            <if test="canBuy != null">can_buy = #{canBuy},</if>
+            <if test="canSale != null">can_sale = #{canSale},</if>
+            <if test="minBuy != null">min_buy = #{minBuy},</if>
+            <if test="fee != null">fee = #{fee},</if>
+            <if test="manager != null">manager = #{manager},</if>
+            <if test="favorite != null">favorite = #{favorite},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSpdFundBaseById" parameterType="Long">
+        delete from spd_ms_fund_base where id = #{id}
+    </delete>
+
+    <delete id="deleteSpdFundBaseByIds" parameterType="String">
+        delete from spd_ms_fund_base where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
