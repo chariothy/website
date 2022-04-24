@@ -17,6 +17,13 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item prop="favorite">
+        <el-checkbox
+          v-model="queryParams.favorite"
+          :true-label=1 :false-label=0
+          label="已收藏的" border
+        />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -85,8 +92,8 @@
       <el-table-column label="可以申购" align="center" prop="canBuy" />
       <el-table-column label="可以赎回" align="center" prop="canSale" />
       <el-table-column label="最低投资额" align="center" prop="minBuy" />
-      <el-table-column label="费用明细" align="center" prop="fee" />
-      <el-table-column label="基金经理" align="center" prop="manager" />
+      <!--      <el-table-column label="费用明细" align="center" prop="fee" />
+            <el-table-column label="基金经理" align="center" prop="manager" /> -->
       <el-table-column label="收藏基金" align="center">
         <template v-slot="scope">
           <div>
@@ -342,18 +349,11 @@ export default {
     },
     /** 收藏按钮操作 */
     handleFav(row) {
-      this.$confirm('是否收藏 "' + row.code + ' - ' + row.name + '"?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        row.favorite = 1
 //        row.poster = JSON.stringify(row.poster)
 //        row.magnets = JSON.stringify(row.magnets)
-        return updateFund(row);
-      }).then(() => {
+        updateFund(row).then(() => {
         this.getList();
-        this.msgSuccess("已收藏");
+          this.$modal.msgSuccess("已" + (row.favorite?"添加":"取消") + "收藏");
       })
     },
   }

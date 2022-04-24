@@ -377,13 +377,12 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(function() {
-        row.seen = 1
         row.poster = JSON.stringify(row.poster)
         row.magnets = JSON.stringify(row.magnets)
         return updateMovie(row);
       }).then(() => {
         this.getList();
-        this.msgSuccess("标志为已看");
+        this.msgSuccess("标志为" + (row.seen?"已":"未") + "看");
       })
     },
     /** 导出按钮操作 */
