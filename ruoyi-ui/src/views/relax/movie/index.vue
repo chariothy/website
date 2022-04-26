@@ -108,19 +108,31 @@
       <el-table-column label="标题" min-width="20%" align="center">
         <template slot-scope="scope">
           ID={{ scope.row.id }} <br>
+          IMDB={{ scope.row.imdb }} <br>
+          豆瓣={{ scope.row.douban }} <br>
           <el-link :href="scope.row.href" type="primary" target="_blank">
             {{ scope.row.titleCn }} <br>
             {{ scope.row.titleEn }}
-          </el-link>
+          </el-link> <br>
+          <el-tooltip class="item" effect="dark" content="标志为已看" placement="left">
+            <el-switch
+              v-model="scope.row.seen"
+              active-value="0"
+              inactive-value="1"
+              @change="handleSeen(scope.row)"
+              v-hasPermi="['relax:movie:edit']"
+            ></el-switch>
+          </el-tooltip>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['relax:movie:remove']"
+          >删除</el-button>
         </template>
       </el-table-column>
       <el-table-column label="内容简介" min-width="40%" align="center" prop="desc" />
-      <el-table-column label="评分" min-width="10%" align="center" >
-        <template slot-scope="scope">
-          IMDB={{ scope.row.imdb }} <br>
-          豆瓣={{ scope.row.douban }} <br>
-        </template>
-      </el-table-column>
       <el-table-column label="电影海报" min-width="30%" align="center" >
         <template slot-scope="scope">
           <viewer :images="scope.row.poster">
@@ -141,28 +153,6 @@
                 </el-link>
               </li>
             </ul>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" min-width="10%" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <div>
-            <el-tooltip class="item" effect="dark" content="标志为已看" placement="left">
-            <el-switch
-              v-model="scope.row.seen"
-              active-value="0"
-              inactive-value="1"
-              @change="handleSeen(scope.row)"
-              v-hasPermi="['relax:movie:edit']"
-            ></el-switch>
-            </el-tooltip>
-            <el-button
-              size="mini"
-              type="text"
-              icon="el-icon-delete"
-              @click="handleDelete(scope.row)"
-              v-hasPermi="['relax:movie:remove']"
-            >删除</el-button>
           </div>
         </template>
       </el-table-column>
