@@ -91,4 +91,17 @@ public class SpdFundBaseServiceImpl implements ISpdFundBaseService
     {
         return SpdFundBaseMapper.deleteSpdFundBaseById(id);
     }
+
+    /**
+     * 收藏基金基础数据
+     *
+     * @param SpdFundBase 基金基础数据
+     * @return 结果
+     */
+    @Override
+    public int updateSpdFundBaseFav(SpdFundBase SpdFundBase)
+    {
+        return SpdFundBaseMapper.updateSpdFundBaseFav(SpdFundBase);
+    }
+
 }

@@ -58,4 +58,12 @@ public interface SpdFundBaseMapper
      * @return 结果
      */
     public int deleteSpdFundBaseByIds(Long[] ids);
+
+    /**
+     * 收藏基金基础数据
+     *
+     * @param SpdFundBase 基金基础数据
+     * @return 结果
+     */
+    public int updateSpdFundBaseFav(SpdFundBase SpdFundBase);
 }

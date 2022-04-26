@@ -72,8 +72,8 @@ public class SpdFundBase extends BaseEntity
     private Long minBuy;
 
     /** 费用明细 */
-    @Excel(name = "费用明细")
-    private String fee;
+    @Excel(name = "费用")
+    private BigDecimal fee;
 
     /** 基金经理 */
     @Excel(name = "基金经理")
@@ -82,6 +82,29 @@ public class SpdFundBase extends BaseEntity
     /** 收藏基金 */
     @Excel(name = "收藏基金")
     private Boolean favorite;
+
+    private BigDecimal freeAt;
+    private String catName;
+    private String managers;
+    private BigDecimal y5Risk;
+    private BigDecimal y5Std;
+    private BigDecimal y5Sharp;
+
+    private String ratingDate;
+    private BigDecimal m6Return;
+    private BigDecimal y5Return;
+
+    private String returnDate;
+    private BigDecimal cashP;
+    private BigDecimal stockP;
+    private BigDecimal bondP;
+    private BigDecimal otherP;
+    private BigDecimal topStock;
+    private BigDecimal topBond;
+
+    private String pfDate;
+    private String asset;
+
 
     public void setId(Long id) 
     {
@@ -209,12 +232,12 @@ public class SpdFundBase extends BaseEntity
     {
         return minBuy;
     }
-    public void setFee(String fee) 
+    public void setFee(BigDecimal fee)
     {
         this.fee = fee;
     }
 
-    public String getFee() 
+    public BigDecimal getFee()
     {
         return fee;
     }
@@ -258,5 +281,149 @@ public class SpdFundBase extends BaseEntity
             .append("manager", getManager())
             .append("favorite", getFavorite())
             .toString();
+    }
+
+    public BigDecimal getFreeAt() {
+        return freeAt;
+    }
+
+    public void setFreeAt(BigDecimal freeAt) {
+        this.freeAt = freeAt;
+    }
+
+    public String getCatName() {
+        return catName;
+    }
+
+    public void setCatName(String catName) {
+        this.catName = catName;
+    }
+
+    public String getManagers() {
+        return managers;
+    }
+
+    public void setManagers(String managers) {
+        this.managers = managers;
+    }
+
+    public BigDecimal getY5Risk() {
+        return y5Risk;
+    }
+
+    public void setY5Risk(BigDecimal y5Risk) {
+        this.y5Risk = y5Risk;
+    }
+
+    public BigDecimal getY5Std() {
+        return y5Std;
+    }
+
+    public void setY5Std(BigDecimal y5Std) {
+        this.y5Std = y5Std;
+    }
+
+    public BigDecimal getY5Sharp() {
+        return y5Sharp;
+    }
+
+    public void setY5Sharp(BigDecimal y5Sharp) {
+        this.y5Sharp = y5Sharp;
+    }
+
+    public BigDecimal getM6Return() {
+        return m6Return;
+    }
+
+    public void setM6Return(BigDecimal m6Return) {
+        this.m6Return = m6Return;
+    }
+
+    public BigDecimal getY5Return() {
+        return y5Return;
+    }
+
+    public void setY5Return(BigDecimal y5Return) {
+        this.y5Return = y5Return;
+    }
+
+    public BigDecimal getCashP() {
+        return cashP;
+    }
+
+    public void setCashP(BigDecimal cashP) {
+        this.cashP = cashP;
+    }
+
+    public BigDecimal getStockP() {
+        return stockP;
+    }
+
+    public void setStockP(BigDecimal stockP) {
+        this.stockP = stockP;
+    }
+
+    public BigDecimal getBondP() {
+        return bondP;
+    }
+
+    public void setBondP(BigDecimal bondP) {
+        this.bondP = bondP;
+    }
+
+    public BigDecimal getotherP() {
+        return otherP;
+    }
+
+    public void setotherP(BigDecimal otherP) {
+        this.otherP = otherP;
+    }
+
+    public BigDecimal getTopStock() {
+        return topStock;
+    }
+
+    public void setTopStock(BigDecimal topStock) {
+        this.topStock = topStock;
+    }
+
+    public BigDecimal getTopBond() {
+        return topBond;
+    }
+
+    public void setTopBond(BigDecimal topBond) {
+        this.topBond = topBond;
+    }
+
+    public String getRatingDate() {
+        return ratingDate;
+    }
+
+    public void setRatingDate(String ratingDate) {
+        this.ratingDate = ratingDate;
+    }
+
+    public String getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(String returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public String getPfDate() {
+        return pfDate;
+    }
+
+    public void setPfDate(String pfDate) {
+        this.pfDate = pfDate;
+    }
+
+    public String getAsset() {
+        return asset;
+    }
+
+    public void setAsset(String asset) {
+        this.asset = asset;
     }
 }

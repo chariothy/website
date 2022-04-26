@@ -77,45 +77,140 @@
     </el-row>
 
     <el-table v-loading="loading" :data="fundList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="基金名称" align="center" prop="name" />
-      <el-table-column label="分类ID" align="center" prop="categoryId" />
-      <el-table-column label="晨星ID" align="center" prop="classId" />
-      <el-table-column label="基金代码" align="center" prop="code" />
-      <el-table-column label="一个月回报" align="center" prop="m1Return" />
-      <el-table-column label="一个月基准指数" align="center" prop="m1Index" />
-      <el-table-column label="一个月同类平均" align="center" prop="m1Cat" />
-      <el-table-column label="成立日期" align="center" prop="regDate" />
-      <el-table-column label="开放日期" align="center" prop="openDate" />
-      <el-table-column label="上市日期" align="center" prop="saleDate" />
-      <el-table-column label="可以申购" align="center" prop="canBuy" />
-      <el-table-column label="可以赎回" align="center" prop="canSale" />
-      <el-table-column label="最低投资额" align="center" prop="minBuy" />
-      <!--      <el-table-column label="费用明细" align="center" prop="fee" />
-            <el-table-column label="基金经理" align="center" prop="manager" /> -->
-      <el-table-column label="收藏基金" align="center">
+      <el-table-column label="基金名称" align="center" >
         <template v-slot="scope">
-          <div>
-            <el-tooltip class="item" effect="dark" content="收藏基金" placement="left">
-              <el-switch
-                v-model="scope.row.favorite"
-                @change="handleFav(scope.row)"
-                v-hasPermi="['invest:fund:edit']"
-              ></el-switch>
-            </el-tooltip>
-          </div>
+          <table class="fund-val-table">
+            <tr>
+              <td>
+                <el-link :href="'http://fund.eastmoney.com/' + scope.row.code + '.html' " type="primary" target="_blank">
+                  {{ scope.row.code }}
+                </el-link>
+              </td>
+              <td>
+                ID={{ scope.row.id }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="fund-name">
+                <el-link :href="'http://www.morningstar.cn/quicktake/' + scope.row.classId " type="primary" target="_blank">
+                  {{ scope.row.name }}
+                </el-link>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                  {{ scope.row.catName }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="date">
+                  {{ scope.row.regDate }}
+              </td>
+            </tr>
+          </table>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['invest:fund:edit']"
-          >修改</el-button>
+      <el-table-column label="晨星评级" align="center" >
+        <template v-slot="scope">
+          <table class="fund-val-table">
+            <tr>
+              <td class="cell-desc">y5夏普</td>
+              <td v-bind:class="[getSharpClass(scope.row.y5Sharp)]">
+                {{ scope.row.y5Sharp | per }}
+              </td>
+            </tr>
+            <tr>
+              <td class="cell-desc">y5风险</td>
+              <td v-bind:class="[getRiskClass(scope.row.y5Risk)]">
+                {{ scope.row.y5Risk | per }}
+              </td>
+            </tr>
+            <tr>
+              <td class="cell-desc">y5波动</td>
+              <td v-bind:class="[getStdClass(scope.row.y5Std)]">
+                {{ scope.row.y5Std | per }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="date">
+                {{scope.row.ratingDate}}
+              </td>
+            </tr>
+          </table>
+        </template>
+      </el-table-column>
+      <el-table-column label="回报" align="center" width="230px">
+        <template v-slot="scope">
+          <table class="fund-val-table">
+            <tr>
+              <td class="cell-desc">m1r</td>
+              <td v-bind:class="[getReturnClass(scope.row.m1Return)]">
+                {{ scope.row.m1Return | per }}
+              </td>
+            </tr>
+            <tr>
+              <td class="cell-desc">m6r</td>
+              <td v-bind:class="[getReturnClass(scope.row.m6Return)]">
+                {{ scope.row.m6Return | per }}
+              </td>
+            </tr>
+            <tr>
+              <td class="cell-desc">y5r</td>
+              <td v-bind:class="[getReturnClass(scope.row.y5Return)]">
+                {{ scope.row.y5Return | per }}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="date">
+                {{scope.row.returnDate}}
+              </td>
+            </tr>
+          </table>
+        </template>
+      </el-table-column>
+      <el-table-column label="基本信息" align="center">
+        <template v-slot="scope">
+
+          <table class="fund-val-table">
+            <tr>
+              <td class="cell-desc">规模</td>
+              <td>{{ scope.row.asset }}亿</td>
+            </tr>
+            <tr>
+              <td class="cell-desc">费用</td>
+              <td>{{ scope.row.fee }}%</td>
+            </tr>
+            <tr>
+              <td class="cell-desc">免费期</td>
+              <td>{{ scope.row.freeAt | free }}</td>
+            </tr>
+            <tr>
+              <td colspan="2" class="manager">
+                {{scope.row.managers}}
+              </td>
+            </tr>
+          </table>
+        </template>
+      </el-table-column>
+      <el-table-column label="资产分布" align="center" width="230px">
+        <template v-slot="scope">
+          <div :id="`pfBar${scope.row.id}`" :style="{width: '200px', height: '100px'}"></div>
+          {{ getPfBar(scope.row) }}
+          <span class="date">{{ scope.row.pfDate }} </span><br>
+        </template>
+      </el-table-column>
+      <!--  <el-table-column label="最低投资额" align="center" prop="minBuy" />
+            <el-table-column label="基金经理" align="center" prop="manager" /> -->
+      <el-table-column label="操作" align="center" width="80px" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-tooltip class="item" effect="dark" content="收藏" placement="left">
+            <el-switch
+              v-model="scope.row.favorite"
+              @change="handleFav(scope.row)"
+              v-hasPermi="['invest:fund:edit']"
+            ></el-switch>
+          </el-tooltip>
+          <br>
           <el-button
             size="mini"
             type="text"
@@ -193,7 +288,8 @@
 </template>
 
 <script>
-import { listFund, getFund, delFund, addFund, updateFund } from "@/api/invest/fund";
+import echarts from 'echarts'
+import { listFund, getFund, delFund, addFund, updateFund, collectFund } from "@/api/invest/fund";
 
 export default {
   name: "Fund",
@@ -235,13 +331,129 @@ export default {
         code: [
           { required: true, message: "基金代码不能为空", trigger: "blur" }
         ],
-      }
+      },
     };
   },
   created() {
     this.getList();
   },
+  mounted() {
+  },
   methods: {
+    getReturnClass(val) {
+      if (val < 0) return 'cell-val-bad'
+      else if (val > 10) return 'cell-val-good'
+      else return ''
+    },
+    getSharpClass(val) {
+      if (val > 1.5 ) return 'cell-val-good'
+      else if (val < 0) return 'cell-val-bad'
+      else return ''
+    },
+    getRiskClass(val) {
+      if (val < 5 ) return 'cell-val-good'
+      else return ''
+    },
+    getStdClass(val) {
+      if (val < 10) return 'cell-val-good'
+      else return ''
+    },
+    getPfLabelPos(val) {
+      let pos = ''
+      if(val >12) pos = ''
+      else pos = 'right'
+      return {position: pos}
+    },
+    getBarOption(data, formatter) {
+      return {
+        tooltip: {
+          // trigger: 'axis',
+          formatter(params) {
+            // 返回值就是html代码可以使用标签
+            return formatter(params)
+          },
+          axisPointer: { // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+          }
+        },
+        grid: {
+          x: 0,//x 偏移量
+            y: 0, // y 偏移量
+            width: '100%', // 宽度
+            height: 100
+        },
+        xAxis: {
+          type: 'value',
+            show: false
+        },
+        yAxis: {
+          type: 'category',
+            show: false
+        },
+        series: [
+          {
+            name: 'Direct',
+            type: 'bar',
+            stack: 'total',
+            barMinHeight:1,
+            itemStyle: {
+              normal: {
+                color: function(params) {
+                  const colorList = ['#EAA720','#EFE42A', '#20EAEA','#AFF77D','#EFE42A','#EAA720'];
+                  return colorList[params.dataIndex]
+                }
+              },
+            },
+            label: {
+              show: true,
+              color: '#000',
+              formatter: "{b} {c}%",
+            },
+            emphasis: {
+              focus: 'series'
+            },
+            data: data
+          }
+        ]
+      }
+    },
+    getPfBar(fund) {
+      const data = [{
+        value: fund.topStock,
+        name: '10股票',
+        label: {position: 'insideLeft'}
+      },{
+        value: fund.topBond,
+        name: '10债券',
+        label: {position: 'insideLeft'}
+      },{
+          value: fund.otherP,
+          name: '其它',
+        label: {position: 'insideLeft'}
+        },{
+        value: fund.cashP,
+        name: '现金',
+        label: {position: 'insideLeft'}
+      },{
+          value: fund.bondP,
+          name: '债券',
+        label: {position: 'insideLeft'}
+        },{
+          value: fund.stockP,
+          name: '股票',
+        label: {position: 'insideLeft'}
+        }]
+      let option = this.getBarOption(data, (params) =>
+        {return `${params.data.name}: ${params.data.value}%`}
+      )
+      //console.log(option)
+
+      this.$nextTick(() => {
+        let myCharts = echarts.init(document.getElementById('pfBar' + fund.id));   //初始化echarts实例
+        myCharts.setOption(option)  //绘制图表, option绘制图表需要的数据
+        myCharts.resize();
+      })
+    },
     /** 查询基金基础数据列表 */
     getList() {
       this.loading = true;
@@ -351,11 +563,47 @@ export default {
     handleFav(row) {
 //        row.poster = JSON.stringify(row.poster)
 //        row.magnets = JSON.stringify(row.magnets)
-        updateFund(row).then(() => {
+        collectFund(row).then(() => {
         this.getList();
           this.$modal.msgSuccess("已" + (row.favorite?"添加":"取消") + "收藏");
       })
     },
+  },
+  filters: {
+    per (val) {
+      return val.toFixed(2)
+    },
+    free (val) {
+      if (val < 4) return val + '年'
+      else return val + '天'
+    }
   }
 };
 </script>
+
+<style>
+.cell-desc {
+  font-weight: bold;
+}
+.cell-val-good {
+  color: blue;
+}
+.cell-val-bad {
+   color: red;
+ }
+.fund-val-table {
+  margin: auto;
+}
+td.date {
+  background: antiquewhite;
+}
+span.date {
+  background: antiquewhite;
+}
+td.manager {
+  max-width: 120px;
+}
+td.fund-name {
+  max-width: 140px;
+}
+</style>

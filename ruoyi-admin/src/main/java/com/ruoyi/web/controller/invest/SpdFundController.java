@@ -93,6 +93,17 @@ public class SpdFundController extends BaseController
     }
 
     /**
+     * 收藏基金基础数据
+     */
+    @PreAuthorize("@ss.hasPermi('invest:fund:edit')")
+    @Log(title = "基金基础数据", businessType = BusinessType.UPDATE)
+    @PutMapping("fav")
+    public AjaxResult collect(@RequestBody SpdFundBase SpdFundBase)
+    {
+        return toAjax(SpdFundBaseService.updateSpdFundBaseFav(SpdFundBase));
+    }
+
+    /**
      * 删除基金基础数据
      */
     @PreAuthorize("@ss.hasPermi('invest:fund:remove')")

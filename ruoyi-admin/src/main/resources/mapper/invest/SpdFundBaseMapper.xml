@@ -3,46 +3,50 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.web.mapper.SpdFundBaseMapper">
-    
+
+    <cache flushInterval="600000" />
     <resultMap type="SpdFundBase" id="SpdFundBaseResult">
-        <result property="id"    column="id"    />
-        <result property="name"    column="name"    />
-        <result property="categoryId"    column="category_id"    />
-        <result property="classId"    column="class_id"    />
-        <result property="code"    column="code"    />
-        <result property="m1Return"    column="m1_return"    />
-        <result property="m1Index"    column="m1_index"    />
-        <result property="m1Cat"    column="m1_cat"    />
-        <result property="regDate"    column="reg_date"    />
-        <result property="openDate"    column="open_date"    />
-        <result property="saleDate"    column="sale_date"    />
-        <result property="canBuy"    column="can_buy"    />
-        <result property="canSale"    column="can_sale"    />
-        <result property="minBuy"    column="min_buy"    />
-        <result property="fee"    column="fee"    />
-        <result property="manager"    column="manager"    />
-        <result property="favorite"    column="favorite"    />
     </resultMap>
 
     <sql id="selectSpdFundBaseVo">
-        select id, name, category_id, class_id, code, m1_return, m1_index, m1_cat, reg_date, open_date, sale_date, can_buy, can_sale, min_buy, fee, manager, favorite from spd_ms_fund_base
+        SELECT b.id, b.name, b.category_id, b.class_id, b.code, b.m1_return, b.m1_index, b.m1_cat, b.reg_date, b.open_date, b.sale_date, b.can_buy, b.can_sale, b.min_buy, b.manager, b.favorite
+             , round(json_value(b.fee, '$.Management')+json_value(b.fee, '$.Custodial')+json_value(b.fee, '$.Distribution'),2) AS fee, f.free_at, c.name AS cat_name, m.managers
+             , r.y5_ms_risk AS y5_risk, r.y5_std, r.y5_sharp, r.rating_date
+             , e.m6_return, e.y5_return, e.return_date, e.asset
+             , p.cash_p, p.stock_p, p.bond_p, p.other_p, p.top_stock_w AS top_stock, p.top_bond_w AS top_bond, p.portfolio_date AS pf_date
+        FROM spd_ms_category c, spd_ms_fund_base b, spd_ms_fund_rating r, spd_ms_fund_return e, spd_ms_fund_portfolio p
+           , (SELECT b.code AS CODE, GROUP_CONCAT(CONCAT(jt.manager, ' (', during,')') SEPARATOR ', ') AS managers
+              FROM spd_ms_fund_base b, json_table(b.manager, '$[*]' columns(
+	manager VARCHAR(10) path '$.ManagerName',
+	during VARCHAR(10) path '$.ManagementTime',
+   is_leave boolean path '$.Leave'
+	)) as jt
+              WHERE jt.is_leave=0 GROUP BY b.code) AS m
+           , (SELECT b.code, free_at
+              FROM spd_ms_fund_base b, json_table(b.fee, '$.Redemption[*]' columns(
+	free_at VARCHAR(50) path '$.key[0]',
+	fee_r VARCHAR(10) path '$.value'
+	)) as jt
+              where fee_r='0.00%') as f
+        WHERE b.category_id=c.class_id AND b.CODE=r.CODE AND b.CODE=e.CODE AND b.CODE=p.CODE and b.code=m.code and b.code=f.code
+          AND r.rating_date = (SELECT max(rating_date) from spd_ms_fund_rating WHERE CODE=b.code)
+          AND e.return_date = (SELECT max(return_date) FROM spd_ms_fund_return WHERE CODE=b.code)
+          AND p.portfolio_date = (SELECT MAX(portfolio_date) FROM spd_ms_fund_portfolio WHERE CODE=b.CODE)
     </sql>
 
-    <select id="selectSpdFundBaseList" parameterType="SpdFundBase" resultMap="SpdFundBaseResult">
+    <select id="selectSpdFundBaseList" parameterType="SpdFundBase" resultMap="SpdFundBaseResult" useCache="true">
         <include refid="selectSpdFundBaseVo"/>
-        <where>  
-            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="code != null  and code != ''"> and code = #{code}</if>
-            <if test="favorite != null "> and favorite = #{favorite}</if>
-        </where>
+        <if test="name != null  and name != ''"> and b.name like concat('%', #{name}, '%')</if>
+        <if test="code != null  and code != ''"> and b.code = #{code}</if>
+        <if test="favorite != null "> and b.favorite = #{favorite}</if>
     </select>
     
-    <select id="selectSpdFundBaseById" parameterType="Long" resultMap="SpdFundBaseResult">
+    <select id="selectSpdFundBaseById" parameterType="Long" resultMap="SpdFundBaseResult" useCache="true">
         <include refid="selectSpdFundBaseVo"/>
         where id = #{id}
     </select>
         
-    <insert id="insertSpdFundBase" parameterType="SpdFundBase" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSpdFundBase" parameterType="SpdFundBase" useGeneratedKeys="true" keyProperty="id" flushCache="true">
         insert into spd_ms_fund_base
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null and name != ''">name,</if>
@@ -82,7 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateSpdFundBase" parameterType="SpdFundBase">
+    <update id="updateSpdFundBase" parameterType="SpdFundBase" flushCache="true">
         update spd_ms_fund_base
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null and name != ''">name = #{name},</if>
@@ -105,11 +109,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteSpdFundBaseById" parameterType="Long">
+    <update id="updateSpdFundBaseFav" parameterType="SpdFundBase" flushCache="true">
+        update spd_ms_fund_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="favorite != null">favorite = #{favorite},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSpdFundBaseById" parameterType="Long" flushCache="true">
         delete from spd_ms_fund_base where id = #{id}
     </delete>
 
-    <delete id="deleteSpdFundBaseByIds" parameterType="String">
+    <delete id="deleteSpdFundBaseByIds" parameterType="String" flushCache="true">
         delete from spd_ms_fund_base where id in 
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}

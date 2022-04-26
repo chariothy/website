@@ -42,3 +42,12 @@ export function delFund(id) {
     method: 'delete'
   })
 }
+
+// 收藏基金基础数据
+export function collectFund(data) {
+  return request({
+    url: '/invest/fund/fav',
+    method: 'put',
+    data: data
+  })
+}
