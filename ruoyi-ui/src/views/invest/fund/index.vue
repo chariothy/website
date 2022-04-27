@@ -114,25 +114,48 @@
         <template v-slot="scope">
           <table class="fund-val-table">
             <tr>
-              <td class="cell-desc">y5夏普</td>
+              <td class="cell-desc"></td>
+              <td class="cell-desc">y5</td>
+              <td class="cell-desc">y3</td>
+            </tr>
+            <tr>
+              <td class="cell-desc">夏普</td>
               <td v-bind:class="[getSharpClass(scope.row.y5Sharp)]">
                 {{ scope.row.y5Sharp | per }}
               </td>
+              <td v-bind:class="[getSharpClass(scope.row.y3Sharp)]">
+                {{ scope.row.y3Sharp | per }}
+              </td>
+              <td>
+                <i v-bind:class="getUpDownClass(scope.row.y3Sharp, scope.row.y5Sharp)"></i>
+              </td>
             </tr>
             <tr>
-              <td class="cell-desc">y5风险</td>
+              <td class="cell-desc">风险</td>
               <td v-bind:class="[getRiskClass(scope.row.y5Risk)]">
                 {{ scope.row.y5Risk | per }}
               </td>
-            </tr>
-            <tr>
-              <td class="cell-desc">y5波动</td>
-              <td v-bind:class="[getStdClass(scope.row.y5Std)]">
-                {{ scope.row.y5Std | per }}
+              <td v-bind:class="[getRiskClass(scope.row.y3Risk)]">
+                {{ scope.row.y3Risk | per }}
+              </td>
+              <td>
+                <i v-bind:class="getUpDownClass(scope.row.y3Risk, scope.row.y5Risk)"></i>
               </td>
             </tr>
             <tr>
-              <td colspan="2" class="date">
+              <td class="cell-desc">波动</td>
+              <td v-bind:class="[getStdClass(scope.row.y5Std)]">
+                {{ scope.row.y5Std | per }}
+              </td>
+              <td v-bind:class="[getStdClass(scope.row.y3Std)]">
+                {{ scope.row.y3Std | per }}
+              </td>
+              <td>
+                <i v-bind:class="getUpDownClass(scope.row.y3Std, scope.row.y5Std)"></i>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" class="date">
                 {{scope.row.ratingDate}}
               </td>
             </tr>
@@ -143,25 +166,46 @@
         <template v-slot="scope">
           <table class="fund-val-table">
             <tr>
-              <td class="cell-desc">m1r</td>
-              <td v-bind:class="[getReturnClass(scope.row.m1Return)]">
-                {{ scope.row.m1Return | per }}
+              <td class="cell-desc">
+                <i v-bind:class="getUpDownClass(scope.row.m3Return, scope.row.m6Return)"></i>
+                m3r
               </td>
-            </tr>
-            <tr>
+              <td v-bind:class="[getReturnClass(scope.row.m3Return)]">
+                {{ scope.row.m3Return | per }}
+              </td>
               <td class="cell-desc">m6r</td>
               <td v-bind:class="[getReturnClass(scope.row.m6Return)]">
                 {{ scope.row.m6Return | per }}
               </td>
             </tr>
             <tr>
+              <td class="cell-desc">
+                <i v-bind:class="getUpDownClass(scope.row.ytdReturn, scope.row.y1Return)"></i>
+                ytd
+              </td>
+              <td v-bind:class="[getReturnClass(scope.row.ytdReturn)]">
+                {{ scope.row.ytdReturn | per }}
+              </td>
+              <td class="cell-desc">y1r</td>
+              <td v-bind:class="[getReturnClass(scope.row.y1Return)]">
+                {{ scope.row.y1Return | per }}
+              </td>
+            </tr>
+            <tr>
+              <td class="cell-desc">
+                <i v-bind:class="getUpDownClass(scope.row.y3Return, scope.row.y5Return)"></i>
+                y3r
+              </td>
+              <td v-bind:class="[getReturnClass(scope.row.y3Return)]">
+                {{ scope.row.y3Return | per }}
+              </td>
               <td class="cell-desc">y5r</td>
               <td v-bind:class="[getReturnClass(scope.row.y5Return)]">
                 {{ scope.row.y5Return | per }}
               </td>
             </tr>
             <tr>
-              <td colspan="2" class="date">
+              <td colspan="4" class="date">
                 {{scope.row.returnDate}}
               </td>
             </tr>
@@ -358,6 +402,11 @@ export default {
       if (val < 10) return 'cell-val-good'
       else return ''
     },
+    getUpDownClass(v1, v2) {
+      if(v1 === v2) return ''
+      else if (v1 < v2) return 'el-icon-caret-bottom cell-val-bad'
+      else return 'el-icon-caret-top cell-val-good'
+    },
     getPfLabelPos(val) {
       let pos = ''
       if(val >12) pos = ''
@@ -420,11 +469,11 @@ export default {
     getPfBar(fund) {
       const data = [{
         value: fund.topStock,
-        name: '10股票',
+        name: '*10股票',
         label: {position: 'insideLeft'}
       },{
         value: fund.topBond,
-        name: '10债券',
+        name: '*10债券',
         label: {position: 'insideLeft'}
       },{
           value: fund.otherP,

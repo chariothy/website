@@ -11,8 +11,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectSpdFundBaseVo">
         SELECT b.id, b.name, b.category_id, b.class_id, b.code, b.m1_return, b.m1_index, b.m1_cat, b.reg_date, b.open_date, b.sale_date, b.can_buy, b.can_sale, b.min_buy, b.manager, b.favorite
              , round(json_value(b.fee, '$.Management')+json_value(b.fee, '$.Custodial')+json_value(b.fee, '$.Distribution'),2) AS fee, f.free_at, c.name AS cat_name, m.managers
-             , r.y5_ms_risk AS y5_risk, r.y5_std, r.y5_sharp, r.rating_date
-             , e.m6_return, e.y5_return, e.return_date, e.asset
+             , r.y5_ms_risk AS y5_risk, r.y5_std, r.y5_sharp, r.y3_ms_risk AS y3_risk, r.y3_std, r.y3_sharp, r.rating_date
+             , e.m3_return, e.m6_return, e.ytd_return, e.y1_return, e.y3_return, e.y5_return, e.return_date, e.asset
              , p.cash_p, p.stock_p, p.bond_p, p.other_p, p.top_stock_w AS top_stock, p.top_bond_w AS top_bond, p.portfolio_date AS pf_date
         FROM spd_ms_category c, spd_ms_fund_base b, spd_ms_fund_rating r, spd_ms_fund_return e, spd_ms_fund_portfolio p
            , (SELECT b.code AS CODE, GROUP_CONCAT(CONCAT(jt.manager, ' (', during,')') SEPARATOR ', ') AS managers

@@ -90,8 +90,17 @@ public class SpdFundBase extends BaseEntity
     private BigDecimal y5Std;
     private BigDecimal y5Sharp;
 
+    private BigDecimal y3Risk;
+    private BigDecimal y3Std;
+    private BigDecimal y3Sharp;
     private String ratingDate;
     private BigDecimal m6Return;
+    private BigDecimal m3Return;
+
+    private BigDecimal ytdReturn;
+    private BigDecimal y1Return;
+
+    private BigDecimal y3Return;
     private BigDecimal y5Return;
 
     private String returnDate;
@@ -425,5 +434,61 @@ public class SpdFundBase extends BaseEntity
 
     public void setAsset(String asset) {
         this.asset = asset;
+    }
+
+    public BigDecimal getY3Risk() {
+        return y3Risk;
+    }
+
+    public void setY3Risk(BigDecimal y3Risk) {
+        this.y3Risk = y3Risk;
+    }
+
+    public BigDecimal getY3Std() {
+        return y3Std;
+    }
+
+    public void setY3Std(BigDecimal y3Std) {
+        this.y3Std = y3Std;
+    }
+
+    public BigDecimal getY3Sharp() {
+        return y3Sharp;
+    }
+
+    public void setY3Sharp(BigDecimal y3Sharp) {
+        this.y3Sharp = y3Sharp;
+    }
+
+    public BigDecimal getM3Return() {
+        return m3Return;
+    }
+
+    public void setM3Return(BigDecimal m3Return) {
+        this.m3Return = m3Return;
+    }
+
+    public BigDecimal getYtdReturn() {
+        return ytdReturn;
+    }
+
+    public void setYtdReturn(BigDecimal ytdReturn) {
+        this.ytdReturn = ytdReturn;
+    }
+
+    public BigDecimal getY1Return() {
+        return y1Return;
+    }
+
+    public void setY1Return(BigDecimal y1Return) {
+        this.y1Return = y1Return;
+    }
+
+    public BigDecimal getY3Return() {
+        return y3Return;
+    }
+
+    public void setY3Return(BigDecimal y3Return) {
+        this.y3Return = y3Return;
     }
 }
