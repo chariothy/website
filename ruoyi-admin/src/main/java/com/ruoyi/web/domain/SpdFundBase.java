@@ -23,10 +23,6 @@ public class SpdFundBase extends BaseEntity
     @Excel(name = "基金名称")
     private String name;
 
-    /** 分类ID */
-    @Excel(name = "分类ID")
-    private String categoryId;
-
     /** 晨星ID */
     @Excel(name = "晨星ID")
     private String classId;
@@ -39,13 +35,9 @@ public class SpdFundBase extends BaseEntity
     @Excel(name = "一个月回报")
     private BigDecimal m1Return;
 
-    /** 一个月基准指数 */
-    @Excel(name = "一个月基准指数")
-    private BigDecimal m1Index;
-
     /** 一个月同类平均 */
     @Excel(name = "一个月同类平均")
-    private BigDecimal m1Cat;
+    private BigDecimal m1CatReturn;
 
     /** 成立日期 */
     @Excel(name = "成立日期")
@@ -84,8 +76,12 @@ public class SpdFundBase extends BaseEntity
     private Boolean favorite;
 
     private BigDecimal freeAt;
+    private Integer y3RiskRating;
+    private Integer y5RiskRating;
+    private Integer y3MsRating;
+    private Integer y5MsRating;
     private String catName;
-    private String managers;
+    private String banchmark;
     private BigDecimal y5Risk;
     private BigDecimal y5Std;
     private BigDecimal y5Sharp;
@@ -99,20 +95,30 @@ public class SpdFundBase extends BaseEntity
 
     private BigDecimal ytdReturn;
     private BigDecimal y1Return;
+    private Integer y1CatSize;
+    private Integer y1CatRank;
 
     private BigDecimal y3Return;
+    private Integer y3CatSize;
+    private Integer y3CatRank;
     private BigDecimal y5Return;
+    private Integer y5CatSize;
+    private Integer y5CatRank;
 
     private String returnDate;
-    private BigDecimal cashP;
-    private BigDecimal stockP;
-    private BigDecimal bondP;
-    private BigDecimal otherP;
+    private BigDecimal cash;
+    private BigDecimal stock;
+    private BigDecimal bond;
+    private BigDecimal other;
     private BigDecimal topStock;
     private BigDecimal topBond;
 
-    private String pfDate;
+    private String portfolioDate;
     private String asset;
+    private String topStocks;
+    private String topBonds;
+    private String managers;
+    private String industrySector;
 
 
     public void setId(Long id) 
@@ -132,15 +138,6 @@ public class SpdFundBase extends BaseEntity
     public String getName() 
     {
         return name;
-    }
-    public void setCategoryId(String categoryId) 
-    {
-        this.categoryId = categoryId;
-    }
-
-    public String getCategoryId() 
-    {
-        return categoryId;
     }
     public void setClassId(String classId) 
     {
@@ -169,23 +166,14 @@ public class SpdFundBase extends BaseEntity
     {
         return m1Return;
     }
-    public void setM1Index(BigDecimal m1Index) 
+    public void setM1CatReturn(BigDecimal m1CatReturn)
     {
-        this.m1Index = m1Index;
+        this.m1CatReturn = m1CatReturn;
     }
 
-    public BigDecimal getM1Index() 
+    public BigDecimal getM1CatReturn()
     {
-        return m1Index;
-    }
-    public void setM1Cat(BigDecimal m1Cat) 
-    {
-        this.m1Cat = m1Cat;
-    }
-
-    public BigDecimal getM1Cat() 
-    {
-        return m1Cat;
+        return m1CatReturn;
     }
     public void setRegDate(String regDate) 
     {
@@ -274,12 +262,10 @@ public class SpdFundBase extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
             .append("name", getName())
-            .append("categoryId", getCategoryId())
             .append("classId", getClassId())
             .append("code", getCode())
             .append("m1Return", getM1Return())
-            .append("m1Index", getM1Index())
-            .append("m1Cat", getM1Cat())
+            .append("m1Cat", getM1CatReturn())
             .append("regDate", getRegDate())
             .append("openDate", getOpenDate())
             .append("saleDate", getSaleDate())
@@ -356,36 +342,36 @@ public class SpdFundBase extends BaseEntity
         this.y5Return = y5Return;
     }
 
-    public BigDecimal getCashP() {
-        return cashP;
+    public BigDecimal getCash() {
+        return cash;
     }
 
-    public void setCashP(BigDecimal cashP) {
-        this.cashP = cashP;
+    public void setCash(BigDecimal cash) {
+        this.cash = cash;
     }
 
-    public BigDecimal getStockP() {
-        return stockP;
+    public BigDecimal getStock() {
+        return stock;
     }
 
-    public void setStockP(BigDecimal stockP) {
-        this.stockP = stockP;
+    public void setStock(BigDecimal stock) {
+        this.stock = stock;
     }
 
-    public BigDecimal getBondP() {
-        return bondP;
+    public BigDecimal getBond() {
+        return bond;
     }
 
-    public void setBondP(BigDecimal bondP) {
-        this.bondP = bondP;
+    public void setBond(BigDecimal bond) {
+        this.bond = bond;
     }
 
-    public BigDecimal getotherP() {
-        return otherP;
+    public BigDecimal getOther() {
+        return other;
     }
 
-    public void setotherP(BigDecimal otherP) {
-        this.otherP = otherP;
+    public void setOther(BigDecimal other) {
+        this.other = other;
     }
 
     public BigDecimal getTopStock() {
@@ -420,12 +406,12 @@ public class SpdFundBase extends BaseEntity
         this.returnDate = returnDate;
     }
 
-    public String getPfDate() {
-        return pfDate;
+    public String getPortfolioDate() {
+        return portfolioDate;
     }
 
-    public void setPfDate(String pfDate) {
-        this.pfDate = pfDate;
+    public void setPortfolioDate(String portfolioDate) {
+        this.portfolioDate = portfolioDate;
     }
 
     public String getAsset() {
@@ -490,5 +476,117 @@ public class SpdFundBase extends BaseEntity
 
     public void setY3Return(BigDecimal y3Return) {
         this.y3Return = y3Return;
+    }
+
+    public String getBanchmark() {
+        return banchmark;
+    }
+
+    public void setBanchmark(String banchmark) {
+        this.banchmark = banchmark;
+    }
+
+    public Integer getY3RiskRating() {
+        return y3RiskRating;
+    }
+
+    public void setY3RiskRating(Integer y3RiskRating) {
+        this.y3RiskRating = y3RiskRating;
+    }
+
+    public Integer getY5RiskRating() {
+        return y5RiskRating;
+    }
+
+    public void setY5RiskRating(Integer y5RiskRating) {
+        this.y5RiskRating = y5RiskRating;
+    }
+
+    public Integer getY3MsRating() {
+        return y3MsRating;
+    }
+
+    public void setY3MsRating(Integer y3MsRating) {
+        this.y3MsRating = y3MsRating;
+    }
+
+    public Integer getY5MsRating() {
+        return y5MsRating;
+    }
+
+    public void setY5MsRating(Integer y5MsRating) {
+        this.y5MsRating = y5MsRating;
+    }
+
+    public Integer getY1CatSize() {
+        return y1CatSize;
+    }
+
+    public void setY1CatSize(Integer y1CatSize) {
+        this.y1CatSize = y1CatSize;
+    }
+
+    public Integer getY1CatRank() {
+        return y1CatRank;
+    }
+
+    public void setY1CatRank(Integer y1CatRank) {
+        this.y1CatRank = y1CatRank;
+    }
+
+    public Integer getY3CatSize() {
+        return y3CatSize;
+    }
+
+    public void setY3CatSize(Integer y3CatSize) {
+        this.y3CatSize = y3CatSize;
+    }
+
+    public Integer getY3CatRank() {
+        return y3CatRank;
+    }
+
+    public void setY3CatRank(Integer y3CatRank) {
+        this.y3CatRank = y3CatRank;
+    }
+
+    public Integer getY5CatSize() {
+        return y5CatSize;
+    }
+
+    public void setY5CatSize(Integer y5CatSize) {
+        this.y5CatSize = y5CatSize;
+    }
+
+    public Integer getY5CatRank() {
+        return y5CatRank;
+    }
+
+    public void setY5CatRank(Integer y5CatRank) {
+        this.y5CatRank = y5CatRank;
+    }
+
+    public String getTopStocks() {
+        return topStocks;
+    }
+
+    public void setTopStocks(String topStocks) {
+        this.topStocks = topStocks;
+    }
+
+    public String getTopBonds() {
+        return topBonds;
+    }
+
+    public void setTopBonds(String topBonds) {
+        this.topBonds = topBonds;
+    }
+
+    public String getIndustrySector() {
+        return industrySector;
+    }
+
+    public void setIndustrySector(String industrySector) {
+        this.industrySector = industrySector;
     }
 }

@@ -103,6 +103,11 @@
               </td>
             </tr>
             <tr>
+              <td colspan="2">
+                {{ scope.row.banchmark }}
+              </td>
+            </tr>
+            <tr>
               <td colspan="2" class="date">
                   {{ scope.row.regDate }}
               </td>
@@ -162,9 +167,18 @@
           </table>
         </template>
       </el-table-column>
-      <el-table-column label="回报" align="center" width="230px">
+      <el-table-column label="回报" align="center">
         <template v-slot="scope">
           <table class="fund-val-table">
+            <tr>
+              <td class="cell-desc">
+                m1r
+              </td>
+              <td colspan="3">
+                {{ scope.row.m1Return | per }} /
+                <span v-bind:class="[getCatReturnClass(scope.row.m1CatReturn)]" >{{ scope.row.m1CatReturn | catPer }} </span>
+              </td>
+            </tr>
             <tr>
               <td class="cell-desc">
                 <i v-bind:class="getUpDownClass(scope.row.m3Return, scope.row.m6Return)"></i>
@@ -196,12 +210,21 @@
                 <i v-bind:class="getUpDownClass(scope.row.y3Return, scope.row.y5Return)"></i>
                 y3r
               </td>
-              <td v-bind:class="[getReturnClass(scope.row.y3Return)]">
-                {{ scope.row.y3Return | per }}
+              <td >
+                <span v-bind:class="[getReturnClass(scope.row.y3Return)]">{{ scope.row.y3Return | per }}</span>
               </td>
               <td class="cell-desc">y5r</td>
-              <td v-bind:class="[getReturnClass(scope.row.y5Return)]">
-                {{ scope.row.y5Return | per }}
+              <td >
+                <span v-bind:class="[getReturnClass(scope.row.y5Return)]">{{ scope.row.y5Return | per }}</span>
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="2" class="return-rank">
+                {{ scope.row.y3CatRank }} / {{ scope.row.y3CatSize }}
+              </td>
+              <td colspan="2" class="return-rank">
+                {{ scope.row.y5CatRank }} / {{ scope.row.y5CatSize }}
               </td>
             </tr>
             <tr>
@@ -229,9 +252,15 @@
               <td>{{ scope.row.freeAt | free }}</td>
             </tr>
             <tr>
-              <td colspan="2" class="manager">
-                {{scope.row.managers}}
+              <td colspan="2" class="manager" v-html="showManagers(scope.row.manager)">
               </td>
+            </tr>
+            <tr>
+              <el-tooltip class="item" effect="dark" placement="left">
+                <div slot="content" v-html="majorSectors(scope.row.industrySector)"></div>
+              <td colspan="2" class="portfolio" v-html="showSectors(scope.row.industrySector)">
+              </td>
+              </el-tooltip>
             </tr>
           </table>
         </template>
@@ -239,8 +268,8 @@
       <el-table-column label="资产分布" align="center" width="230px">
         <template v-slot="scope">
           <div :id="`pfBar${scope.row.id}`" :style="{width: '200px', height: '100px'}"></div>
-          {{ getPfBar(scope.row) }}
-          <span class="date">{{ scope.row.pfDate }} </span><br>
+          {{ getPortfolioBar(scope.row) }}
+          <div v-html="showTopPortfolio(scope.row)" class="portfolio"></div>
         </template>
       </el-table-column>
       <!--  <el-table-column label="最低投资额" align="center" prop="minBuy" />
@@ -389,6 +418,11 @@ export default {
       else if (val > 10) return 'cell-val-good'
       else return ''
     },
+    getCatReturnClass(val) {
+      if (val < 0) return 'cell-val-bad'
+      else if (val > 0) return 'cell-val-good'
+      else return ''
+    },
     getSharpClass(val) {
       if (val > 1.5 ) return 'cell-val-good'
       else if (val < 0) return 'cell-val-bad'
@@ -407,7 +441,7 @@ export default {
       else if (v1 < v2) return 'el-icon-caret-bottom cell-val-bad'
       else return 'el-icon-caret-top cell-val-good'
     },
-    getPfLabelPos(val) {
+    getPortfolioLabelPos(val) {
       let pos = ''
       if(val >12) pos = ''
       else pos = 'right'
@@ -466,29 +500,21 @@ export default {
         ]
       }
     },
-    getPfBar(fund) {
+    getPortfolioBar(fund) {
       const data = [{
-        value: fund.topStock,
-        name: '*10股票',
-        label: {position: 'insideLeft'}
-      },{
-        value: fund.topBond,
-        name: '*10债券',
-        label: {position: 'insideLeft'}
-      },{
-          value: fund.otherP,
+          value: fund.other,
           name: '其它',
         label: {position: 'insideLeft'}
         },{
-        value: fund.cashP,
+        value: fund.cash,
         name: '现金',
         label: {position: 'insideLeft'}
       },{
-          value: fund.bondP,
+          value: fund.bond,
           name: '债券',
         label: {position: 'insideLeft'}
         },{
-          value: fund.stockP,
+          value: fund.stock,
           name: '股票',
         label: {position: 'insideLeft'}
         }]
@@ -617,10 +643,127 @@ export default {
           this.$modal.msgSuccess("已" + (row.favorite?"添加":"取消") + "收藏");
       })
     },
+    showManagers (m) {
+      if(m) {
+        let currents = JSON.parse(m).filter(function (s) {
+          return !s.Leave
+        })
+        let formatted = currents.map(function (m) {
+          return `${m.ManagerName} (${m.ManagementTime})`
+        })
+        return formatted.join('<br>')
+      }
+      return ''
+    },
+    shortSector(s) {
+      if (s.length <= 3) return s
+      return s.replaceAll('、','').substring(0,2) + '业'
+    },
+    showSectors (s) {
+      if(s) {
+        let keptMajor = JSON.parse(s).filter(function (v) {
+          return v.NetAssetWeight > 1
+        })
+        let sorted = keptMajor.sort(function (a, b) {
+          return -(a.NetAssetWeight - b.NetAssetWeight)
+        })
+        let formatted = _.take(sorted, 3).map(m => {
+          return `<li>` + this.shortSector(m.IndustryName) + ` ${m.NetAssetWeight}/${m.CatAvgWeight}</li>`
+        })
+        return formatted.join('')
+      }
+      return ''
+    },
+    majorSectors(s) {
+      if(s) {
+        let keptMajor = JSON.parse(s).filter(function (v) {
+          return v.NetAssetWeight > 1
+        })
+        let sorted = keptMajor.sort(function (a, b) {
+          return -(a.NetAssetWeight - b.NetAssetWeight)
+        })
+        let formatted = sorted.map(m => {
+          return `<li>${m.IndustryName} ${m.NetAssetWeight}% / ${m.CatAvgWeight}%</li>`
+        })
+        return formatted.join('')
+      }
+      return ''
+    },
+    showTopPortfolio (fund) {
+      let topStock = ''
+      let topBond = ''
+
+      if(fund.topStocks) {
+        let sorted = JSON.parse(fund.topStocks).sort(function (a, b) {
+          return -(a.Percent - b.Percent)
+        })
+        let formatted = _.take(sorted, 3).map(m => {
+          return `${m.HoldingName} ${m.Percent}`
+        })
+        topStock = formatted.join('<br>')
+      }
+      if(fund.topBonds) {
+        let sorted = JSON.parse(fund.topBonds).sort(function (a, b) {
+          return -(a.Percent - b.Percent)
+        })
+        let formatted = _.take(sorted, 3).map(m => {
+          return `${m.HoldingName}: ${m.Percent}`
+        })
+        topBond = formatted.join('<br>')
+      }
+      if (fund.stock > 10 && fund.bond > 10) {
+        return `
+<table>
+<tr>
+    <th>前十 ${fund.topStock}%</th>
+    <th>前十 ${fund.topBond}%</th>
+</tr>
+<tr>
+    <td>${topStock}</td>
+    <td>${topBond}</td>
+</tr>
+<tr>
+    <td colspan="2" class="date">${fund.portfolioDate}</td>
+</tr>
+</table>
+      `
+      } else if (fund.stock > 10) {
+        return `
+<table>
+<tr>
+    <th>前十 ${fund.topStock}%</th>
+</tr>
+<tr>
+    <td>${topStock}</td>
+</tr>
+<tr>
+    <td class="date">${fund.portfolioDate}</td>
+</tr>
+</table>
+      `
+      } else if (fund.bond > 10) {
+        return `
+<table class="top-portfolio">
+<tr>
+    <th>前十 ${fund.topBond}%</th>
+</tr>
+<tr>
+    <td>${topBond}</td>
+</tr>
+<tr>
+    <td class="date">${fund.portfolioDate}</td>
+</tr>
+</table>
+      `
+      }
+    }
   },
   filters: {
     per (val) {
       return val.toFixed(2)
+    },
+    catPer (val) {
+      return val < 0 ? '' : '+' + val.toFixed(2)
     },
     free (val) {
       if (val < 4) return val + '年'
@@ -631,6 +774,10 @@ export default {
 </script>
 
 <style>
+.fund-val-table td {
+  border: 1px solid white;
+  background: #f6f8fabd;
+}
 .cell-desc {
   font-weight: bold;
 }
@@ -644,7 +791,8 @@ export default {
   margin: auto;
 }
 td.date {
-  background: antiquewhite;
+  background: antiquewhite !important;
+  text-align: center;
 }
 span.date {
   background: antiquewhite;
@@ -654,5 +802,27 @@ td.manager {
 }
 td.fund-name {
   max-width: 140px;
+}
+td.return-rank {
+  text-align: right;
+}
+.portfolio {
+  text-align: left;
+}
+.portfolio li {
+  list-style: decimal;
+}
+.el-tooltip__popper li {
+  list-style: decimal;
+}
+.portfolio {
+  font-size: 1px;
+}
+.portfolio tr {
+  vertical-align: baseline;
+}
+.portfolio td {
+  border: 1px solid white;
+  background: #f6f8fabd;
 }
 </style>

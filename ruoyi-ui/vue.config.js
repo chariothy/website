@@ -7,6 +7,7 @@ function resolve(dir) {
 
 const name = process.env.VUE_APP_TITLE || 'Henry的管理系统' // 网页标题
 const CompressionPlugin = require('compression-webpack-plugin')
+const webpack = require('webpack')
 
 const port = process.env.port || process.env.npm_config_port || 80 // 端口
 
@@ -64,6 +65,9 @@ module.exports = {
         filename: '[path].gz[query]',   // 压缩后的文件名
         algorithm: 'gzip',              // 使用gzip压缩
         minRatio: 0.8                   // 压缩率小于1才会压缩
+      }),
+      new webpack.ProvidePlugin({
+        _: 'lodash'
       })
     ],
   },
