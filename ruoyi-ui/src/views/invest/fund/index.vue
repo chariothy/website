@@ -76,8 +76,197 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="fundList" @selection-change="handleSelectionChange">
-      <el-table-column label="基金名称" align="center" >
+    <!-- Mobile -->
+    <el-card :key="fund.code" class="box-card" v-if="isMobile()" v-for="fund in fundList">
+      <div slot="header" class="clearfix">
+        <el-button style="float: left; padding: 5px 3px 0 0" type="text" size="medium"
+                   @click="handleFavByClick(fund)"
+                   v-hasPermi="['invest:fund:edit']">
+          <i v-bind:class="fund.favorite ? 'el-icon-star-on' : 'el-icon-star-off'"></i>
+        </el-button>
+        <span>
+          <el-link :href="'http://fund.eastmoney.com/' + fund.code + '.html' " type="primary" target="_blank" style="padding-right: 3px">
+                  {{ fund.code }}
+                </el-link>
+          <el-link :href="'http://www.morningstar.cn/quicktake/' + fund.classId " type="primary" target="_blank">
+                  {{ fund.name }}
+                </el-link></span>
+
+      </div>
+      <div id="fund-list-mobile" class="text item">
+        <table style="font-size: xx-small;">
+          <tr>
+            <th>
+              分类
+            </th>
+            <td colspan="5">
+              {{ fund.catName }}
+            </td>
+          </tr>
+          <tr>
+            <th>
+              基准
+            </th>
+            <td colspan="5">
+              {{ fund.banchmark }}
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2">
+              成立日期
+            </th>
+            <td class="date" colspan="2">
+              {{ fund.regDate }}
+            </td>
+          </tr>
+          <tr>
+            <th>规模</th>
+            <td>{{ fund.asset }}亿</td>
+            <th>费用</th>
+            <td>{{ fund.fee }}%</td>
+            <th>免费期</th>
+            <td>{{ fund.freeAt | free }}</td>
+          </tr>
+          <tr>
+            <th>经理</th>
+            <td colspan="5" class="manager" v-html="showManagers(fund.manager)" />
+          </tr>
+          <tr>
+            <th>行业<br>分布<br>前3</th>
+            <td colspan="5" class="portfolio" v-html="showSectors(fund.industrySector)" />
+          </tr>
+          <tr>
+            <th colspan="2">
+              3年评级
+            </th>
+            <td colspan="4" style="text-align: center;">
+              <el-rate v-model="fund.y3MsRating" disabled />
+            </td>
+          </tr>
+          <tr>
+            <th>夏普</th>
+            <td v-bind:class="[getSharpClass(fund.y3Sharp)]">
+              {{ fund.y3Sharp | per }}
+              <i v-bind:class="getUpDownClass(fund.y3Sharp, fund.y5Sharp)"></i>
+            </td>
+            <th>风险</th>
+            <td v-bind:class="[getRiskClass(fund.y3Risk)]">
+              {{ fund.y3Risk | per }}
+              <i v-bind:class="getUpDownClass(fund.y3Risk, fund.y5Risk)"></i>
+            </td>
+            <th>波动</th>
+            <td v-bind:class="[getStdClass(fund.y3Std)]">
+              {{ fund.y3Std | per }}
+              <i v-bind:class="getUpDownClass(fund.y3Std, fund.y5Std)"></i>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2">
+              5年评级
+            </th>
+            <td colspan="4" style="text-align: center;">
+              <el-rate v-model="fund.y5MsRating" disabled />
+            </td>
+          </tr>
+          <tr>
+            <th>夏普</th>
+            <td v-bind:class="[getSharpClass(fund.y5Sharp)]">
+              {{ fund.y5Sharp | per }}
+            </td>
+            <th>风险</th>
+            <td v-bind:class="[getRiskClass(fund.y5Risk)]">
+              {{ fund.y5Risk | per }}
+            </td>
+            <th>波动</th>
+            <td v-bind:class="[getStdClass(fund.y5Std)]">
+              {{ fund.y5Std | per }}
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2">
+              评级日期
+            </th>
+            <td class="date" colspan="2">
+              {{ fund.ratingDate }}
+            </td>
+          </tr>
+
+          <tr>
+            <th colspan="2">
+              短期回报
+            </th>
+            <td colspan="4" class="cell-desc" style="text-align: center;">
+              m1={{ fund.m1Return | per }} /
+              <span v-bind:class="[getCatReturnClass(fund.m1CatReturn)]" >{{ fund.m1CatReturn | catPer }} </span>
+            </td>
+          </tr>
+          <tr>
+            <th>m3</th>
+            <td v-bind:class="[getReturnClass(fund.m3Return)]">
+              {{ fund.m3Return | per }}
+            </td>
+            <th>m6</th>
+            <td v-bind:class="[getReturnClass(fund.m6Return)]">
+              {{ fund.m6Return | per }}
+            </td>
+            <th>ytd</th>
+            <td v-bind:class="[getReturnClass(fund.y1eturn)]">
+              {{ fund.y1Return | per }}
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2">
+              中期回报
+            </th>
+            <td colspan="4">
+            </td>
+          </tr>
+          <tr>
+            <th>y3</th>
+            <td colspan="2" v-bind:class="[getReturnClass(fund.y3Return)]">
+              {{ fund.y3Return | per }} ({{ fund.y3CatRank }} / {{ fund.y3CatSize }})
+            </td>
+            <th>y5</th>
+            <td colspan="2" v-bind:class="[getReturnClass(fund.y5Return)]">
+              {{ fund.y5Return | per }} ({{ fund.y5CatRank }} / {{ fund.y5CatSize }})
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2">
+              回报日期
+            </th>
+            <td class="date" colspan="2">
+              {{ fund.returnDate }}
+            </td>
+          </tr>
+          <tr>
+            <th>
+              资产
+            </th>
+            <td colspan="5">
+              <span>股票</span> <span>{{ fund.stock }}</span>
+              <span>债券</span> <span>{{ fund.bond }}</span>
+              <span>现金</span> <span>{{ fund.cash }}</span>
+              <span>其它</span> <span>{{ fund.other }}</span>
+            </td>
+          </tr>
+          <tr>
+            <th>
+              股票<br>前十<br>{{ fund.topStock }}
+            </th>
+            <td colspan="2" v-html="showTopStock(fund)" />
+            <th>
+              债券<br>前十<br>{{ fund.topBond }}
+            </th>
+            <td colspan="2" v-html="showTopBond(fund)" />
+          </tr>
+        </table>
+      </div>
+    </el-card>
+
+        <!-- Desktop -->
+    <el-table v-loading="loading" :data="fundList" @selection-change="handleSelectionChange" v-if="!isMobile()">
+      <el-table-column label="基金名称" align="center">
         <template v-slot="scope">
           <table class="fund-val-table">
             <tr>
@@ -99,7 +288,7 @@
             </tr>
             <tr>
               <td colspan="2">
-                  {{ scope.row.catName }}
+                {{ scope.row.catName }}
               </td>
             </tr>
             <tr>
@@ -109,7 +298,7 @@
             </tr>
             <tr>
               <td colspan="2" class="date">
-                  {{ scope.row.regDate }}
+                {{ scope.row.regDate }}
               </td>
             </tr>
           </table>
@@ -258,8 +447,8 @@
             <tr>
               <el-tooltip class="item" effect="dark" placement="left">
                 <div slot="content" v-html="majorSectors(scope.row.industrySector)"></div>
-              <td colspan="2" class="portfolio" v-html="showSectors(scope.row.industrySector)">
-              </td>
+                <td colspan="2" class="portfolio" v-html="showSectors(scope.row.industrySector)">
+                </td>
               </el-tooltip>
             </tr>
           </table>
@@ -634,13 +823,19 @@ export default {
         ...this.queryParams
       }, `fund_${new Date().getTime()}.xlsx`)
     },
-    /** 收藏按钮操作 */
+    /** 收藏Switch按钮操作 */
     handleFav(row) {
-//        row.poster = JSON.stringify(row.poster)
-//        row.magnets = JSON.stringify(row.magnets)
         collectFund(row).then(() => {
         this.getList();
           this.$modal.msgSuccess("已" + (row.favorite?"添加":"取消") + "收藏");
+      })
+    },
+    /** 收藏按钮操作 */
+    handleFavByClick(row) {
+      row.favorite = !row.favorite
+      collectFund(row).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("已" + (row.favorite?"添加":"取消") + "收藏");
       })
     },
     showManagers (m) {
@@ -711,7 +906,7 @@ export default {
         })
         topBond = formatted.join('<br>')
       }
-      if (fund.stock > 10 && fund.bond > 10) {
+      if (fund.stock > 10 || fund.bond > 10) {
         return `
 <table>
 <tr>
@@ -727,35 +922,32 @@ export default {
 </tr>
 </table>
       `
-      } else if (fund.stock > 10) {
-        return `
-<table>
-<tr>
-    <th>前十 ${fund.topStock}%</th>
-</tr>
-<tr>
-    <td>${topStock}</td>
-</tr>
-<tr>
-    <td class="date">${fund.portfolioDate}</td>
-</tr>
-</table>
-      `
-      } else if (fund.bond > 10) {
-        return `
-<table class="top-portfolio">
-<tr>
-    <th>前十 ${fund.topBond}%</th>
-</tr>
-<tr>
-    <td>${topBond}</td>
-</tr>
-<tr>
-    <td class="date">${fund.portfolioDate}</td>
-</tr>
-</table>
-      `
       }
+      return ''
+    },
+    showTopStock (fund) {
+      if (fund.topStocks) {
+        let sorted = JSON.parse(fund.topStocks).sort(function (a, b) {
+          return -(a.Percent - b.Percent)
+        })
+        let formatted = _.take(sorted, 3).map(m => {
+          return `${m.HoldingName} ${m.Percent}`
+        })
+        return formatted.join('<br>')
+      }
+      return ''
+    },
+    showTopBond (fund) {
+      if(fund.topBonds) {
+        let sorted = JSON.parse(fund.topBonds).sort(function (a, b) {
+          return -(a.Percent - b.Percent)
+        })
+        let formatted = _.take(sorted, 3).map(m => {
+          return `${m.HoldingName}: ${m.Percent}`
+        })
+        return formatted.join('<br>')
+      }
+      return ''
     }
   },
   filters: {
@@ -824,5 +1016,13 @@ td.return-rank {
 .portfolio td {
   border: 1px solid white;
   background: #f6f8fabd;
+}
+#fund-list-mobile th {
+  text-align: center;
+  background: #c4f2f8;
+  padding: 1px;
+}
+#fund-list-mobile td {
+  background: #f1f7f8
 }
 </style>

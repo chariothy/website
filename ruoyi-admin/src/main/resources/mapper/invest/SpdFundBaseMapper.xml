@@ -24,9 +24,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectSpdFundBaseList" parameterType="SpdFundBase" resultMap="SpdFundBaseResult" useCache="true">
         <include refid="selectSpdFundBaseVo"/>
-        <if test="name != null  and name != ''"> and b.name like concat('%', #{name}, '%')</if>
-        <if test="code != null  and code != ''"> and b.code = #{code}</if>
-        <if test="favorite != null "> and b.favorite = #{favorite}</if>
+        <where>
+                <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+                <if test="code != null  and code != ''"> and code = #{code}</if>
+                <if test="favorite != null "> and favorite = #{favorite}</if>
+        </where>
     </select>
     
     <select id="selectSpdFundBaseById" parameterType="Long" resultMap="SpdFundBaseResult" useCache="true">

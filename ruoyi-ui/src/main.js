@@ -76,6 +76,10 @@ Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size
 })
 
+Vue.prototype.isMobile = function () {
+  return this.$store.state.app.device === 'mobile'
+}
+
 Vue.config.productionTip = false
 
 /** 为github pages做的优化
