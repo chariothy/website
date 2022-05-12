@@ -15,8 +15,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="country"    column="country"    />
         <result property="category"    column="category"    />
         <result property="showDate"    column="show_date"    />
-        <result property="poster"    column="poster"    />
-        <result property="magnets"    column="magnets"    />
+        <result property="poster"    column="poster" typeHandler="com.ruoyi.web.handler.JsonArrayTypeHandler" />
+        <result property="magnets"    column="magnets" typeHandler="com.ruoyi.web.handler.JsonArrayTypeHandler" />
         <result property="seen"    column="seen"    />
     </resultMap>
 
@@ -105,5 +105,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
-    
+
+    <update id="handleMovieSeen" parameterType="SpdMovie">
+        update spd_movie
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="seen != null">seen = #{seen},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
 </mapper>

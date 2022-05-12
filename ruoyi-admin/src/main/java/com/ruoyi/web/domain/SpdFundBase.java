@@ -1,6 +1,8 @@
 package com.ruoyi.web.domain;
 
 import java.math.BigDecimal;
+
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -69,7 +71,7 @@ public class SpdFundBase extends BaseEntity
 
     /** 基金经理 */
     @Excel(name = "基金经理")
-    private String manager;
+    private JSONArray manager;
 
     /** 收藏基金 */
     @Excel(name = "收藏基金")
@@ -115,10 +117,10 @@ public class SpdFundBase extends BaseEntity
 
     private String portfolioDate;
     private String asset;
-    private String topStocks;
-    private String topBonds;
+    private JSONArray topStocks;
+    private JSONArray topBonds;
     private String managers;
-    private String industrySector;
+    private JSONArray industrySector;
 
 
     public void setId(Long id) 
@@ -238,12 +240,12 @@ public class SpdFundBase extends BaseEntity
     {
         return fee;
     }
-    public void setManager(String manager) 
+    public void setManager(JSONArray manager)
     {
         this.manager = manager;
     }
 
-    public String getManager() 
+    public JSONArray getManager()
     {
         return manager;
     }
@@ -566,27 +568,27 @@ public class SpdFundBase extends BaseEntity
         this.y5CatRank = y5CatRank;
     }
 
-    public String getTopStocks() {
+    public JSONArray getTopStocks() {
         return topStocks;
     }
 
-    public void setTopStocks(String topStocks) {
+    public void setTopStocks(JSONArray topStocks) {
         this.topStocks = topStocks;
     }
 
-    public String getTopBonds() {
+    public JSONArray getTopBonds() {
         return topBonds;
     }
 
-    public void setTopBonds(String topBonds) {
+    public void setTopBonds(JSONArray topBonds) {
         this.topBonds = topBonds;
     }
 
-    public String getIndustrySector() {
+    public JSONArray getIndustrySector() {
         return industrySector;
     }
 
-    public void setIndustrySector(String industrySector) {
+    public void setIndustrySector(JSONArray industrySector) {
         this.industrySector = industrySector;
     }
 }

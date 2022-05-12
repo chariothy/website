@@ -58,4 +58,6 @@ public interface ISpdMovieService
      * @return 结果
      */
     public int deleteSpdMovieById(Long id);
+    public int handleMovieSeen(SpdMovie spdMovie);
+
 }

@@ -1,6 +1,8 @@
 package com.ruoyi.web.domain;
 
 import java.util.Date;
+
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -30,7 +32,7 @@ public class SpdAdult extends BaseEntity
 
     /** 图片列表 */
     @Excel(name = "图片列表")
-    private String pics;
+    private JSONArray pics;
 
     /** 种子地址 */
     @Excel(name = "种子地址")
@@ -76,12 +78,12 @@ public class SpdAdult extends BaseEntity
     {
         return href;
     }
-    public void setPics(String pics) 
+    public void setPics(JSONArray pics)
     {
         this.pics = pics;
     }
 
-    public String getPics() 
+    public JSONArray getPics()
     {
         return pics;
     }

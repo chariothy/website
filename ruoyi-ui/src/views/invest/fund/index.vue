@@ -77,9 +77,12 @@
     </el-row>
 
     <!-- Mobile -->
-    <el-card :key="fund.code" class="box-card" v-if="isMobile()" v-for="fund in fundList">
+    <el-card :key="fund.code" class="box-card"
+             style="margin-bottom: 5px"
+             v-if="isMobile()"
+             v-for="fund in fundList">
       <div slot="header" class="clearfix">
-        <el-button style="float: left; padding: 5px 3px 0 0" type="text" size="medium"
+        <el-button style="float: left; padding: 0 3px 0 0; font-size: 22px" type="text" size="medium"
                    @click="handleFavByClick(fund)"
                    v-hasPermi="['invest:fund:edit']">
           <i v-bind:class="fund.favorite ? 'el-icon-star-on' : 'el-icon-star-off'"></i>
@@ -132,11 +135,7 @@
             <td colspan="5" class="manager" v-html="showManagers(fund.manager)" />
           </tr>
           <tr>
-            <th>行业<br>分布<br>前3</th>
-            <td colspan="5" class="portfolio" v-html="showSectors(fund.industrySector)" />
-          </tr>
-          <tr>
-            <th colspan="2">
+            <th colspan="2" class="rating">
               3年评级
             </th>
             <td colspan="4" style="text-align: center;">
@@ -144,24 +143,24 @@
             </td>
           </tr>
           <tr>
-            <th>夏普</th>
+            <th class="rating">夏普</th>
             <td v-bind:class="[getSharpClass(fund.y3Sharp)]">
               {{ fund.y3Sharp | per }}
               <i v-bind:class="getUpDownClass(fund.y3Sharp, fund.y5Sharp)"></i>
             </td>
-            <th>风险</th>
+            <th class="rating">风险</th>
             <td v-bind:class="[getRiskClass(fund.y3Risk)]">
               {{ fund.y3Risk | per }}
               <i v-bind:class="getUpDownClass(fund.y3Risk, fund.y5Risk)"></i>
             </td>
-            <th>波动</th>
+            <th class="rating">波动</th>
             <td v-bind:class="[getStdClass(fund.y3Std)]">
               {{ fund.y3Std | per }}
               <i v-bind:class="getUpDownClass(fund.y3Std, fund.y5Std)"></i>
             </td>
           </tr>
           <tr>
-            <th colspan="2">
+            <th colspan="2" class="rating">
               5年评级
             </th>
             <td colspan="4" style="text-align: center;">
@@ -169,21 +168,21 @@
             </td>
           </tr>
           <tr>
-            <th>夏普</th>
+            <th class="rating">夏普</th>
             <td v-bind:class="[getSharpClass(fund.y5Sharp)]">
               {{ fund.y5Sharp | per }}
             </td>
-            <th>风险</th>
+            <th class="rating">风险</th>
             <td v-bind:class="[getRiskClass(fund.y5Risk)]">
               {{ fund.y5Risk | per }}
             </td>
-            <th>波动</th>
+            <th class="rating">波动</th>
             <td v-bind:class="[getStdClass(fund.y5Std)]">
               {{ fund.y5Std | per }}
             </td>
           </tr>
           <tr>
-            <th colspan="2">
+            <th colspan="2" class="rating">
               评级日期
             </th>
             <td class="date" colspan="2">
@@ -192,7 +191,7 @@
           </tr>
 
           <tr>
-            <th colspan="2">
+            <th colspan="2" class="return">
               短期回报
             </th>
             <td colspan="4" class="cell-desc" style="text-align: center;">
@@ -201,38 +200,38 @@
             </td>
           </tr>
           <tr>
-            <th>m3</th>
+            <th class="return">m3</th>
             <td v-bind:class="[getReturnClass(fund.m3Return)]">
               {{ fund.m3Return | per }}
             </td>
-            <th>m6</th>
+            <th class="return">m6</th>
             <td v-bind:class="[getReturnClass(fund.m6Return)]">
               {{ fund.m6Return | per }}
             </td>
-            <th>ytd</th>
+            <th class="return">ytd</th>
             <td v-bind:class="[getReturnClass(fund.y1eturn)]">
               {{ fund.y1Return | per }}
             </td>
           </tr>
           <tr>
-            <th colspan="2">
+            <th colspan="2" class="return">
               中期回报
             </th>
             <td colspan="4">
             </td>
           </tr>
           <tr>
-            <th>y3</th>
+            <th class="return">y3</th>
             <td colspan="2" v-bind:class="[getReturnClass(fund.y3Return)]">
-              {{ fund.y3Return | per }} ({{ fund.y3CatRank }} / {{ fund.y3CatSize }})
+              {{ fund.y3Return | per }} ({{ fund.y3CatRank }}/{{ fund.y3CatSize }})
             </td>
-            <th>y5</th>
+            <th class="return">y5</th>
             <td colspan="2" v-bind:class="[getReturnClass(fund.y5Return)]">
-              {{ fund.y5Return | per }} ({{ fund.y5CatRank }} / {{ fund.y5CatSize }})
+              {{ fund.y5Return | per }} ({{ fund.y5CatRank }}/{{ fund.y5CatSize }})
             </td>
           </tr>
           <tr>
-            <th colspan="2">
+            <th colspan="2" class="return">
               回报日期
             </th>
             <td class="date" colspan="2">
@@ -240,25 +239,37 @@
             </td>
           </tr>
           <tr>
-            <th>
+            <th class="portfolio">
               资产
             </th>
             <td colspan="5">
-              <span>股票</span> <span>{{ fund.stock }}</span>
-              <span>债券</span> <span>{{ fund.bond }}</span>
-              <span>现金</span> <span>{{ fund.cash }}</span>
+              <span>股票</span> <span>{{ fund.stock }} </span>
+              <span>债券</span> <span>{{ fund.bond }} </span>
+              <span>现金</span> <span>{{ fund.cash }} </span>
               <span>其它</span> <span>{{ fund.other }}</span>
             </td>
           </tr>
           <tr>
-            <th>
+            <th colspan="2" class="portfolio">行业分布<br>TOP3</th>
+            <td colspan="4" class="portfolio" v-html="showSectors(fund.industrySector)" />
+          </tr>
+          <tr>
+            <th class="portfolio">
               股票<br>前十<br>{{ fund.topStock }}
             </th>
-            <td colspan="2" v-html="showTopStock(fund)" />
-            <th>
+            <td colspan="2" v-html="getTopPortfolio(fund.topStocks)" />
+            <th class="portfolio">
               债券<br>前十<br>{{ fund.topBond }}
             </th>
-            <td colspan="2" v-html="showTopBond(fund)" />
+            <td colspan="2" v-html="getTopPortfolio(fund.topBonds)" />
+          </tr>
+          <tr>
+            <th colspan="2" class="portfolio">
+              资产日期
+            </th>
+            <td class="date" colspan="2">
+              {{ fund.portfolioDate }}
+            </td>
           </tr>
         </table>
       </div>
@@ -826,7 +837,7 @@ export default {
     /** 收藏Switch按钮操作 */
     handleFav(row) {
         collectFund(row).then(() => {
-        this.getList();
+          this.getList();
           this.$modal.msgSuccess("已" + (row.favorite?"添加":"取消") + "收藏");
       })
     },
@@ -840,13 +851,11 @@ export default {
     },
     showManagers (m) {
       if(m) {
-        let currents = JSON.parse(m).filter(function (s) {
+        return m.filter(function (s) {
           return !s.Leave
-        })
-        let formatted = currents.map(function (m) {
+        }).map(function (m) {
           return `${m.ManagerName} (${m.ManagementTime})`
-        })
-        return formatted.join('<br>')
+        }).join('<br>')
       }
       return ''
     },
@@ -856,57 +865,41 @@ export default {
     },
     showSectors (s) {
       if(s) {
-        let keptMajor = JSON.parse(s).filter(function (v) {
+        let sorted = s.filter(function (v) {
           return v.NetAssetWeight > 1
-        })
-        let sorted = keptMajor.sort(function (a, b) {
+        }).sort(function (a, b) {
           return -(a.NetAssetWeight - b.NetAssetWeight)
         })
-        let formatted = _.take(sorted, 3).map(m => {
+        return _.take(sorted, 3).map(m => {
           return `<li>` + this.shortSector(m.IndustryName) + ` ${m.NetAssetWeight}/${m.CatAvgWeight}</li>`
-        })
-        return formatted.join('')
+        }).join('')
       }
       return ''
     },
     majorSectors(s) {
       if(s) {
-        let keptMajor = JSON.parse(s).filter(function (v) {
+        return s.filter(function (v) {
           return v.NetAssetWeight > 1
-        })
-        let sorted = keptMajor.sort(function (a, b) {
+        }).sort(function (a, b) {
           return -(a.NetAssetWeight - b.NetAssetWeight)
-        })
-        let formatted = sorted.map(m => {
+        }).map(m => {
           return `<li>${m.IndustryName} ${m.NetAssetWeight}% / ${m.CatAvgWeight}%</li>`
-        })
-        return formatted.join('')
+        }).join('')
       }
       return ''
     },
+    getTopPortfolio(p) {
+      return _(p)
+        .orderBy(['Percent'], ['desc'])
+        .take(3)
+        .map(m => `${m.HoldingName} ${m.Percent}`)
+        .join('<br>')
+    },
     showTopPortfolio (fund) {
-      let topStock = ''
-      let topBond = ''
-
-      if(fund.topStocks) {
-        let sorted = JSON.parse(fund.topStocks).sort(function (a, b) {
-          return -(a.Percent - b.Percent)
-        })
-        let formatted = _.take(sorted, 3).map(m => {
-          return `${m.HoldingName} ${m.Percent}`
-        })
-        topStock = formatted.join('<br>')
-      }
-      if(fund.topBonds) {
-        let sorted = JSON.parse(fund.topBonds).sort(function (a, b) {
-          return -(a.Percent - b.Percent)
-        })
-        let formatted = _.take(sorted, 3).map(m => {
-          return `${m.HoldingName}: ${m.Percent}`
-        })
-        topBond = formatted.join('<br>')
-      }
       if (fund.stock > 10 || fund.bond > 10) {
+        let topStock = this.getTopPortfolio(fund.topStocks)
+        let topBond = this.getTopPortfolio(fund.topBonds)
+
         return `
 <table>
 <tr>
@@ -925,30 +918,6 @@ export default {
       }
       return ''
     },
-    showTopStock (fund) {
-      if (fund.topStocks) {
-        let sorted = JSON.parse(fund.topStocks).sort(function (a, b) {
-          return -(a.Percent - b.Percent)
-        })
-        let formatted = _.take(sorted, 3).map(m => {
-          return `${m.HoldingName} ${m.Percent}`
-        })
-        return formatted.join('<br>')
-      }
-      return ''
-    },
-    showTopBond (fund) {
-      if(fund.topBonds) {
-        let sorted = JSON.parse(fund.topBonds).sort(function (a, b) {
-          return -(a.Percent - b.Percent)
-        })
-        let formatted = _.take(sorted, 3).map(m => {
-          return `${m.HoldingName}: ${m.Percent}`
-        })
-        return formatted.join('<br>')
-      }
-      return ''
-    }
   },
   filters: {
     per (val) {
@@ -1024,5 +993,14 @@ td.return-rank {
 }
 #fund-list-mobile td {
   background: #f1f7f8
+}
+#fund-list-mobile th.rating {
+  background: #eff2ad;
+}
+#fund-list-mobile th.portfolio {
+  background: #eff2ad;
+}
+.el-card__body {
+  padding: 10px;
 }
 </style>

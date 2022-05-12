@@ -5,7 +5,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.web.mapper.SpdFundBaseMapper">
 
     <cache flushInterval="600000" />
-    <resultMap type="SpdFundBase" id="SpdFundBaseResult" />
+    <resultMap type="SpdFundBase" id="SpdFundBaseResult">
+        <result property="manager" column="manager" typeHandler="com.ruoyi.web.handler.JsonArrayTypeHandler" />
+        <result property="topStocks" column="top_stocks" typeHandler="com.ruoyi.web.handler.JsonArrayTypeHandler" />
+        <result property="topBonds" column="top_bonds" typeHandler="com.ruoyi.web.handler.JsonArrayTypeHandler" />
+        <result property="industrySector" column="industry_sector" typeHandler="com.ruoyi.web.handler.JsonArrayTypeHandler" />
+    </resultMap>
 
     <sql id="selectSpdFundBaseVo">
         SELECT id, code, name, cat_name, banchmark, class_id, reg_date, favorite, fee, free_at

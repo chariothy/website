@@ -58,4 +58,6 @@ public interface SpdMovieMapper
      * @return 结果
      */
     public int deleteSpdMovieByIds(Long[] ids);
+
+    public int handleMovieSeen(SpdMovie spdMovie);
 }

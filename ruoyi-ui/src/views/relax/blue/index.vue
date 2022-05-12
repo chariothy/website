@@ -10,14 +10,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="是否有码" prop="has_mosaic">
-        <el-input
-          v-model="queryParams.hasMosaic"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -50,7 +42,51 @@
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="blueList" @selection-change="handleSelectionChange" :row-class-name="tableRowClassName"
+    <!-- Mobile -->
+    <el-card class="box-card"
+             style="margin-bottom: 5px"
+             :body-style="{ padding: '0px' }"
+             :key="movie.id"
+             v-if="isMobile()"
+             v-for="movie in blueList">
+      <div v-viewer="{toolbar: false}" class="images clearfix" v-if="showPic">
+        <img
+          v-for="src in movie.pics"
+          :key="src"
+          :src="src"
+          class="image">
+      </div>
+
+      <div style="padding: 14px;">
+        <el-link :href="adultUrlMap[movie.source]+movie.href"
+                 type="primary" target="_blank" style="font-size: x-small">
+          {{ movie.title }}
+        </el-link> <br>
+        <div class="bottom clearfix" style="text-align: right">
+          <el-link :href="movie.torrent" type="primary" target="_blank"
+                   style="font-size: 20px; padding-top: 9px; float: left">
+            <i class="el-icon-download"></i>
+          </el-link>
+          <span style="padding-top: 9px; padding-left:  float: left">{{ movie.source }}</span>
+          <el-popconfirm
+            icon="el-icon-info"
+            icon-color="red"
+            title="确认删除？"
+            @confirm="handleDel(movie)"
+            v-hasPermi="['relax:blue:remove']"
+          >
+            <el-button type="text" slot="reference" style="font-size: 20px; color: red"
+                       icon="el-icon-delete" />
+          </el-popconfirm>
+        </div>
+      </div>
+    </el-card>
+
+    <!-- Desktop -->
+    <el-table v-loading="loading" :data="blueList"
+              @selection-change="handleSelectionChange"
+              :row-class-name="tableRowClassName"
+              v-if="!isMobile()"
               ref="adultTable">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="链接" min-width="20%" align="center" prop="href">
@@ -199,12 +235,6 @@ export default {
       this.loading = true;
       listBlue(this.queryParams).then(response => {
         this.blueList = response.rows;
-        for (let i = 0; i < this.blueList.length; i++) {
-          let blue = this.blueList[i]
-          if(blue.pics && blue.pics.length > 2) {
-            this.blueList[i].pics = JSON.parse(blue.pics)
-          }
-        }
         this.total = response.total;
         this.loading = false;
       });
@@ -212,8 +242,7 @@ export default {
     /** 查询成人电影列表 */
     getAdultUrlMap() {
       getKvByKey('ad.url').then(response => {
-        let value = JSON.parse(response.data.json);
-        this.adultUrlMap = value;
+        this.adultUrlMap = JSON.parse(response.data.json);
       });
     },
     // 取消按钮
@@ -274,13 +303,13 @@ export default {
           this.form.hasMosaic = this.form.hasMosaic.join(",");
           if (this.form.id != null) {
             updateBlue(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addBlue(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -299,7 +328,16 @@ export default {
           return delBlue(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
+        })
+    },
+    /** 移动端删除按钮操作 */
+    handleDel(row) {
+      const ids = row.id || this.ids;
+      delBlue(ids)
+        .then(() => {
+          this.getList();
+          this.$modal.msgSuccess("删除成功");
         })
     },
     /** 导出按钮操作 */

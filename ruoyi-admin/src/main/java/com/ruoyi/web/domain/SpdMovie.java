@@ -2,6 +2,9 @@ package com.ruoyi.web.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -60,14 +63,14 @@ public class SpdMovie extends BaseEntity
 
     /** 电影海报 */
     @Excel(name = "电影海报")
-    private String poster;
+    private JSONArray poster;
 
     /** 磁力列表 */
     @Excel(name = "磁力列表")
-    private String magnets;
+    private JSONArray magnets;
 
     /** 逻辑删除 */
-    private int seen;
+    private Boolean seen;
 
     public void setId(Long id) 
     {
@@ -159,30 +162,30 @@ public class SpdMovie extends BaseEntity
     {
         return showDate;
     }
-    public void setPoster(String poster) 
+    public void setPoster(JSONArray poster)
     {
         this.poster = poster;
     }
 
-    public String getPoster() 
+    public JSONArray getPoster()
     {
         return poster;
     }
-    public void setMagnets(String magnets)
+    public void setMagnets(JSONArray magnets)
     {
         this.magnets = magnets;
     }
 
-    public String getMagnets()
+    public JSONArray getMagnets()
     {
         return magnets;
     }
-    public void setSeen(int seen)
+    public void setSeen(Boolean seen)
     {
         this.seen = seen;
     }
 
-    public int getSeen()
+    public Boolean getSeen()
     {
         return seen;
     }

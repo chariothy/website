@@ -90,4 +90,9 @@ public class SpdMovieServiceImpl implements ISpdMovieService
     {
         return spdMovieMapper.deleteSpdMovieById(id);
     }
+
+    @Override
+    public int handleMovieSeen(SpdMovie spdMovie) {
+        return spdMovieMapper.handleMovieSeen(spdMovie);
+    }
 }

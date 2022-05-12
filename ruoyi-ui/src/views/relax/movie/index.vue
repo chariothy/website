@@ -1,16 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" id="search-area">
-      <el-form-item label="ID" prop="id">
-        <el-input
-          v-model="queryParams.id"
-          placeholder="ID"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
       <el-form-item label="中文标题" prop="titleCn">
         <el-input
           v-model="queryParams.titleCn"
@@ -27,26 +17,6 @@
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="IMDB分数" prop="imdb">
-        <el-input
-          v-model="queryParams.imdb"
-          placeholder="IMDB分数"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
-        />
-      </el-form-item>
-      <el-form-item label="豆瓣分数" prop="douban">
-        <el-input
-          v-model="queryParams.douban"
-          placeholder="豆瓣分数"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-          class="search-short"
         />
       </el-form-item>
       <el-form-item prop="seen">
@@ -104,7 +74,54 @@
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="movieList" @selection-change="handleSelectionChange">
+    <!-- Mobile -->
+    <el-card class="box-card"
+             style="margin-bottom: 5px"
+             :body-style="{ padding: '0px' }"
+             :key="movie.id"
+             v-if="isMobile()"
+             v-for="movie in movieList">
+      <div v-viewer="{toolbar: false}" class="images clearfix">
+        <img
+          v-for="src in movie.poster"
+          :key="src"
+          :src="src"
+          class="image">
+      </div>
+
+      <div style="padding: 14px;">
+        <el-link :href="movie.href" type="primary" target="_blank" style="font-size: large">
+            {{ movie.titleCn }} / {{ movie.titleEn }}
+        </el-link> <br>
+        <span style="font-size: small">IMDB: {{ movie.imdb }} / 豆瓣: {{ movie.douban }}</span> <br>
+        <span style="font-size: smaller">{{ movie.country }} / {{ movie.category }}</span> <br>
+        <span style="font-size: xx-small">{{ movie.desc }}</span>
+        <div class="bottom clearfix">
+          <span style="padding-top: 9px; float: right">{{ movie.showDate }}</span>
+          <el-popconfirm
+            v-bind:title="`标志电影为${movie.seen ? '未看' : '已看'}？`"
+            @confirm="handleSeen(movie)"
+            v-hasPermi="['relax:movie:edit']"
+          >
+            <el-button type="text" slot="reference" style="font-size: 25px; padding-right: 10px"
+                       v-bind:icon="movie.seen ? 'el-icon-star-on' : 'el-icon-star-off'" />
+          </el-popconfirm>
+          <el-popconfirm
+            icon="el-icon-info"
+            icon-color="red"
+            title="确认删除？"
+            @confirm="handleDel(movie)"
+            v-hasPermi="['relax:movie:remove']"
+          >
+            <el-button type="text" slot="reference" style="font-size: 25px; color: red"
+                       icon="el-icon-delete" />
+          </el-popconfirm>
+        </div>
+      </div>
+    </el-card>
+
+    <!-- Desktop -->
+    <el-table v-loading="loading" :data="movieList" @selection-change="handleSelectionChange" v-if="!isMobile()">
       <el-table-column label="标题" min-width="20%" align="center">
         <template slot-scope="scope">
           ID={{ scope.row.id }} <br>
@@ -114,22 +131,6 @@
             {{ scope.row.titleCn }} <br>
             {{ scope.row.titleEn }}
           </el-link> <br>
-          <el-tooltip class="item" effect="dark" content="标志为已看" placement="left">
-            <el-switch
-              v-model="scope.row.seen"
-              active-value="0"
-              inactive-value="1"
-              @change="handleSeen(scope.row)"
-              v-hasPermi="['relax:movie:edit']"
-            ></el-switch>
-          </el-tooltip>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['relax:movie:remove']"
-          >删除</el-button>
         </template>
       </el-table-column>
       <el-table-column label="内容简介" min-width="40%" align="center" prop="desc" />
@@ -154,6 +155,28 @@
               </li>
             </ul>
           </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="80px" class-name="small-padding fixed-width">
+        <template v-slot="scope">
+          <el-popconfirm
+            v-bind:title="`标志电影为${scope.row.seen ? '未看' : '已看'}？`"
+            @confirm="handleSeen(scope.row)"
+            v-hasPermi="['relax:movie:edit']"
+          >
+            <el-button type="text" slot="reference" style="font-size: 25px; padding-right: 10px"
+                       v-bind:icon="scope.row.seen ? 'el-icon-star-on' : 'el-icon-star-off'" />
+          </el-popconfirm>
+          <el-popconfirm
+            icon="el-icon-info"
+            icon-color="red"
+            title="确认删除？"
+            @confirm="handleDel(scope.row)"
+            v-hasPermi="['relax:movie:remove']"
+          >
+            <el-button type="text" slot="reference" style="font-size: 25px; color: red"
+                       icon="el-icon-delete" />
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -184,7 +207,7 @@
 </template>
 
 <script>
-import { listMovie, getMovie, delMovie, addMovie, updateMovie, exportMovie } from "@/api/relax/movie";
+import { listMovie, getMovie, delMovie, addMovie, updateMovie, exportMovie, sawMovie } from "@/api/relax/movie";
 
 import 'viewerjs/dist/viewer.css'
 import VueViewer from 'v-viewer'
@@ -258,15 +281,6 @@ export default {
       this.loading = true;
       listMovie(this.queryParams).then(response => {
         this.movieList = response.rows;
-        for (let i = 0; i < this.movieList.length; i++) {
-          let movie = this.movieList[i]
-          if(movie.magnets && movie.magnets.length > 2) {
-            this.movieList[i].magnets = JSON.parse(movie.magnets)
-          }
-          if(movie.poster && movie.poster.length > 2) {
-            this.movieList[i].poster = JSON.parse(movie.poster)
-          }
-        }
         this.total = response.total;
         this.loading = false;
       });
@@ -332,13 +346,13 @@ export default {
         if (valid) {
           if (this.form.id != null) {
             updateMovie(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addMovie(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
             });
@@ -357,22 +371,21 @@ export default {
           return delMovie(ids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.$modal.msgSuccess("删除成功");
         })
+    },
+    /** 移动端已看按钮操作 */
+    handleDel(row) {
+      delMovie(row.id).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("删除成功");
+      })
     },
     /** 已看按钮操作 */
     handleSeen(row) {
-      this.$confirm('是否确认将"' + row.titleCn + '"标志为已看?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        row.poster = JSON.stringify(row.poster)
-        row.magnets = JSON.stringify(row.magnets)
-        return updateMovie(row);
-      }).then(() => {
+      row.seen = !row.seen
+      sawMovie(row).then(() => {
         this.getList();
-        this.msgSuccess("标志为" + (row.seen?"已":"未") + "看");
       })
     },
     /** 导出按钮操作 */
@@ -399,5 +412,10 @@ export default {
         width: 100px;
       }
     }
+  }
+
+  .image {
+    width: 100%;
+    display: block;
   }
 </style>

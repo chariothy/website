@@ -8,7 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"    column="id"    />
         <result property="title"    column="title"    />
         <result property="href"    column="href"    />
-        <result property="pics"    column="pics"    />
+        <result property="pics"    column="pics"   typeHandler="com.ruoyi.web.handler.JsonArrayTypeHandler" />
         <result property="torrent"    column="torrent"    />
         <result property="hasMosaic"    column="has_mosaic"    />
         <result property="source"    column="source"    />

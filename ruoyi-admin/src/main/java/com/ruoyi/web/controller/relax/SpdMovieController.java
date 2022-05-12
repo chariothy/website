@@ -1,6 +1,8 @@
 package com.ruoyi.web.controller.relax;
 
 import java.util.List;
+
+import org.apache.ibatis.type.ArrayTypeHandler;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,4 +102,16 @@ public class SpdMovieController extends BaseController
     {
         return toAjax(spdMovieService.deleteSpdMovieByIds(ids));
     }
+
+    /**
+     * 收藏基金基础数据
+     */
+    @PreAuthorize("@ss.hasPermi('relax:movie:edit')")
+    @Log(title = "最新电影", businessType = BusinessType.UPDATE)
+    @PutMapping("saw")
+    public AjaxResult saw(@RequestBody SpdMovie spdMovie)
+    {
+        return toAjax(spdMovieService.handleMovieSeen(spdMovie));
+    }
+
 }

@@ -51,3 +51,13 @@ export function exportMovie(query) {
     params: query
   })
 }
+
+
+// 导出最新电影
+export function sawMovie(data) {
+  return request({
+    url: '/relax/movie/saw',
+    method: 'put',
+    data: data
+  })
+}
