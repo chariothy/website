@@ -1,7 +1,8 @@
 package com.ruoyi.web.handler;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.ibatis.type.*;
 
 import java.sql.CallableStatement;
@@ -40,7 +41,7 @@ public class JsonArrayTypeHandler extends BaseTypeHandler<JSONArray> {
     public JSONArray getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String sqlJson = rs.getString(columnName);
         if (null != sqlJson){
-            return JSONObject.parseArray(sqlJson);
+            return JSON.parseArray(sqlJson);
         }
         return null;
     }
@@ -56,7 +57,7 @@ public class JsonArrayTypeHandler extends BaseTypeHandler<JSONArray> {
     public JSONArray getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String sqlJson = rs.getString(columnIndex);
         if (null != sqlJson){
-            return JSONObject.parseArray(sqlJson);
+            return JSON.parseArray(sqlJson);
         }
         return null;
     }
@@ -65,7 +66,7 @@ public class JsonArrayTypeHandler extends BaseTypeHandler<JSONArray> {
     public JSONArray getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String sqlJson = cs.getString(columnIndex);
         if (null != sqlJson){
-            return JSONObject.parseArray(sqlJson);
+            return JSON.parseArray(sqlJson);
         }
         return null;
     }
